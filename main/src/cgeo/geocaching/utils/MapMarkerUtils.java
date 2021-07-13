@@ -22,6 +22,7 @@ import android.graphics.drawable.LayerDrawable;
 import android.util.Pair;
 import android.util.SparseArray;
 
+import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.res.ResourcesCompat;
@@ -360,7 +361,15 @@ public final class MapMarkerUtils {
      */
     @NonNull
     public static LayerDrawable createCacheDotMarker(final Resources res, final Geocache cache) {
-        final Drawable[] layers = { ResourcesCompat.getDrawable(res, cache.isFound() ? R.drawable.dot_found : cache.getType().dotMarkerId, null) };
+        int drawable;
+        if (cache.isFound()) {
+            drawable = R.drawable.dot_found;
+        } else if (cache.hasLogOffline() && cache.getOfflineLogType().isFoundLog()) {
+            drawable = R.drawable.dot_found_offline;
+        } else {
+            drawable = cache.getType().dotMarkerId;
+        }
+        final Drawable[] layers = { ResourcesCompat.getDrawable(res, drawable, null) };
         return new LayerDrawable(layers);
     }
 
