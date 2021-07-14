@@ -32,12 +32,12 @@ public enum CacheType {
     VIRTUAL("virtual", "Virtual Cache", "294d4360-ac86-4c83-84dd-8113ef678d7e", R.string.virtual, R.string.virtual_short, R.drawable.type_virtual, "4", R.drawable.dot_virtual),
     WHERIGO("wherigo", "Wherigo Cache", "0544fa55-772d-4e5c-96a9-36a51ebcf5c9", R.string.wherigo, R.string.wherigo_short, R.drawable.type_wherigo, "1858", R.drawable.dot_mystery),
     COMMUN_CELEBRATION("communceleb", "Community Celebration Event", "3ea6533d-bb52-42fe-b2d2-79a3424d4728", R.string.communceleb, R.string.communceleb_short, R.drawable.type_celebrationevent, "3653", R.drawable.dot_event), // icon missing
-    PROJECT_APE("ape", "Project Ape Cache", "2555690d-b2bc-4b55-b5ac-0cb704c0b768", R.string.ape, R.string.ape_short, R.drawable.type_ape, "9", R.drawable.dot_traditional),
-    GCHQ("gchq", "Geocaching HQ", "416f2494-dc17-4b6a-9bab-1a29dd292d8c", R.string.gchq, R.string.gchq_short, R.drawable.type_hq, "3773", R.drawable.dot_traditional),
+    PROJECT_APE("ape", "Project Ape Cache", "2555690d-b2bc-4b55-b5ac-0cb704c0b768", R.string.ape, R.string.ape_short, R.drawable.type_ape, "9", R.drawable.dot_special),
+    GCHQ("gchq", "Geocaching HQ", "416f2494-dc17-4b6a-9bab-1a29dd292d8c", R.string.gchq, R.string.gchq_short, R.drawable.type_hq, "3773", R.drawable.dot_special),
     GCHQ_CELEBRATION("gchqceleb", "Geocaching HQ Celebration", "af820035-787a-47af-b52b-becc8b0c0c88", R.string.gchqceleb, R.string.gchqceleb_short, R.drawable.type_celebrationevent, "3774", R.drawable.dot_event), // icon missing
-    GPS_EXHIBIT("gps", "GPS Adventures Exhibit", "72e69af2-7986-4990-afd9-bc16cbbb4ce3", R.string.gps, R.string.gps_short, R.drawable.type_event, "1304", R.drawable.dot_event), // icon missing
+    GPS_EXHIBIT("gps", "GPS Adventures Exhibit", "72e69af2-7986-4990-afd9-bc16cbbb4ce3", R.string.gps, R.string.gps_short, R.drawable.type_event, "1304", R.drawable.dot_special), // icon missing
     BLOCK_PARTY("block", "Geocaching HQ Block Party", "bc2f3df2-1aab-4601-b2ff-b5091f6c02e3", R.string.block, R.string.block_short, R.drawable.type_celebrationevent, "4738", R.drawable.dot_event), // icon missing
-    LOCATIONLESS("locationless", "Locationless (Reverse) Cache", "8f6dd7bc-ff39-4997-bd2e-225a0d2adf9d", R.string.locationless, R.string.locationless_short, R.drawable.type_virtual, "12", R.drawable.dot_virtual), // icon missing
+    LOCATIONLESS("locationless", "Locationless (Reverse) Cache", "8f6dd7bc-ff39-4997-bd2e-225a0d2adf9d", R.string.locationless, R.string.locationless_short, R.drawable.type_locationless, "12", R.drawable.dot_unknown), // icon missing
     ADVLAB("advlab", "Lab Cache", "", R.string.advlab, R.string.advlab_short, R.drawable.type_advlab, "", R.drawable.dot_advlab), // pattern "Lab Cache" is used by https://gcutils.de/lab2gpx/
 
     // insert other official cache types before USER_DEFINED and UNKNOWN
