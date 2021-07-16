@@ -250,9 +250,9 @@ public final class MapMarkerUtils {
         final InsetsBuilder insetsBuilder = new InsetsBuilder(res, marker.getIntrinsicWidth(), marker.getIntrinsicHeight());
 
         // Show the background circle only on map
-        if (showBackground(cacheListType)) {
+        //if (showBackground(cacheListType)) {
             insetsBuilder.withInset(new InsetBuilder(marker));
-        }
+        //}
         // reliable or not
         if (!cache.isReliableLatLon() && showUnreliableLatLon(cacheListType)) {
             insetsBuilder.withInset(new InsetBuilder(R.drawable.marker_notreliable));
@@ -374,7 +374,7 @@ public final class MapMarkerUtils {
         int drawable;
         if (cache.isFound()) {
             drawable = R.drawable.dot_found;
-        } else if (cache.hasLogOffline()) {
+        /*} else if (cache.hasLogOffline()) {
             final LogType offlineLogType = cache.getOfflineLogType();
             // logs of type NOTE may have a NA/NM log attached to them
             if (offlineLogType.isFoundLog()) {
@@ -394,7 +394,7 @@ public final class MapMarkerUtils {
                 }
             } else {
                 drawable = cache.getType().dotMarkerId;
-            }
+            }*/
         } else {
             drawable = cache.getType().dotMarkerId;
         }
