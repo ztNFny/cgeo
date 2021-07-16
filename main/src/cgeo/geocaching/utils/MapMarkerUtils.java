@@ -371,7 +371,34 @@ public final class MapMarkerUtils {
      */
     @NonNull
     public static LayerDrawable createCacheDotMarker(final Resources res, final Geocache cache) {
-        final Drawable[] layers = { ResourcesCompat.getDrawable(res, cache.isFound() ? R.drawable.dot_found : cache.getType().dotMarkerId, null) };
+        int drawable;
+        if (cache.isFound()) {
+            drawable = R.drawable.dot_found;
+        } else if (cache.hasLogOffline()) {
+            final LogType offlineLogType = cache.getOfflineLogType();
+            // logs of type NOTE may have a NA/NM log attached to them
+            if (offlineLogType.isFoundLog()) {
+                drawable = R.drawable.dot_found_offline;
+            } else if (offlineLogType == LogType.DIDNT_FIND_IT) {
+                drawable = R.drawable.dot_not_found_offline;
+            } else if (cache.hasWillAttendForFutureEvent()) {
+                drawable = R.drawable.dot_marker_calendar;
+            } else if (offlineLogType == LogType.NOTE) {
+                final LogEntry offlineLog = cache.getOfflineLog();
+                if (offlineLog.reportProblem == ReportProblemType.NO_PROBLEM) {
+                    drawable = R.drawable.dot_note_offline;
+                } else if (offlineLog.reportProblem == ReportProblemType.ARCHIVE) {
+                    drawable = R.drawable.dot_marker_archive_offline;
+                } else {
+                    drawable = R.drawable.dot_marker_maintenance_offline;
+                }
+            } else {
+                drawable = cache.getType().dotMarkerId;
+            }
+        } else {
+            drawable = cache.getType().dotMarkerId;
+        }
+        final Drawable[] layers = { ResourcesCompat.getDrawable(res, drawable, null) };
         return new LayerDrawable(layers);
     }
 
