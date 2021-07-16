@@ -390,7 +390,7 @@ public final class MapMarkerUtils {
         int drawable;
         if (cache.isFound()) {
             drawable = R.drawable.dot_found;
-        /*} else if (cache.hasLogOffline()) {
+        } else if (cache.hasLogOffline()) {
             final LogType offlineLogType = cache.getOfflineLogType();
             // logs of type NOTE may have a NA/NM log attached to them
             if (offlineLogType.isFoundLog()) {
@@ -410,7 +410,9 @@ public final class MapMarkerUtils {
                 }
             } else {
                 drawable = cache.getType().dotMarkerId;
-            }*/
+            }
+        } else if (cache.hasUserModifiedCoords()) {
+            drawable = R.drawable.dot_marker_usermodifiedcoords;
         } else {
             drawable = cache.getType().dotMarkerId;
         }
