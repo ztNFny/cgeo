@@ -1260,7 +1260,7 @@
     <string name="cache_images">Images</string>
     <string name="cache_advanced">Advanced</string>
     <string name="cache_waypoints">Waypoints</string>
-    <string name="waypoints_tabtitle" tools:ignore="PluralsCandidate">waypoints (%d)</string>
+    <string name="waypoints_tabtitle" tools:ignore="PluralsCandidate">Waypoints (%d)</string>
     <string name="cache_waypoints_add">Add Waypoint</string>
     <string name="cache_waypoints_add_currentLocation">Add current location</string>
     <string name="cache_waypoints_add_fromclipboard">Add from clipboard</string>
@@ -1308,6 +1308,7 @@
     <string name="cache_menu_map_ext">Other external apps</string>
     <string name="cache_menu_streetview">Street View</string>
     <string name="cache_menu_browser">Open in browser</string>
+    <string name="no_browser_found">No browser found</string>
     <string name="cache_menu_open_with">Open with…</string>
     <string name="cache_menu_visit">Log Visit</string>
     <string name="cache_log_too_long">c:geo couldn\'t submit your log cause it is too long. But thanks for trying to write such an extensive log ;-)</string>
