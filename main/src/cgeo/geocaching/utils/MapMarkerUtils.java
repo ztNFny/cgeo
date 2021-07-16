@@ -19,6 +19,8 @@ import cgeo.geocaching.utils.builders.InsetBuilder.VERTICAL;
 import cgeo.geocaching.utils.builders.InsetsBuilder;
 
 import android.content.res.Resources;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.util.Pair;
@@ -249,7 +251,7 @@ public final class MapMarkerUtils {
         final Drawable marker = ResourcesCompat.getDrawable(res, cache.getMapMarkerId(), null);
         final InsetsBuilder insetsBuilder = new InsetsBuilder(res, marker.getIntrinsicWidth(), marker.getIntrinsicHeight());
 
-        // Show the background circle only on map
+        // Show the background circle only on map - TODO: round marker for list
         //if (showBackground(cacheListType)) {
             insetsBuilder.withInset(new InsetBuilder(marker));
         //}
@@ -259,6 +261,7 @@ public final class MapMarkerUtils {
         }
         // cache type
         final int mainMarkerId = getMainMarkerId(cache, cacheListType);
+
         final boolean doubleSize = showBigSmileys(cacheListType) && mainMarkerId != cache.getType().markerId;
         if (useEmoji > 0 && !doubleSize) {
             if (cPaint == null) {
@@ -267,8 +270,19 @@ public final class MapMarkerUtils {
                 cPaint = new EmojiUtils.EmojiPaint(res, markerDimensions, markerAvailable, (int) (markerDimensions.second * 0.05), DisplayUtils.calculateMaxFontsize(35, 10, 100, markerAvailable));
             }
             insetsBuilder.withInset(new InsetBuilder(EmojiUtils.getEmojiDrawable(cPaint, useEmoji)));
-        } else {
+        } else if (doubleSize) {
             insetsBuilder.withInset(new InsetBuilder(mainMarkerId, VERTICAL.CENTER, HORIZONTAL.CENTER, doubleSize));
+        } else {
+            Drawable mainIcon = ResourcesCompat.getDrawable(res, mainMarkerId, null);
+            // greyscale disabled caches - TODO: Proper implementation
+            if (cache.isDisabled()) {
+                ColorMatrix matrix = new ColorMatrix();
+                matrix.setSaturation(0);
+                ColorMatrixColorFilter cf = new ColorMatrixColorFilter(matrix);
+                mainIcon.setColorFilter(cf);
+            }
+            insetsBuilder.withInset(new InsetBuilder(mainIcon, VERTICAL.CENTER, HORIZONTAL.CENTER));
+
         }
         // archived
         if (cache.isArchived()) {
