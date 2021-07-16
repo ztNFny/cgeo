@@ -252,9 +252,11 @@ public final class MapMarkerUtils {
         final InsetsBuilder insetsBuilder = new InsetsBuilder(res, marker.getIntrinsicWidth(), marker.getIntrinsicHeight());
 
         // Show the background circle only on map - TODO: round marker for list
-        //if (showBackground(cacheListType)) {
+        if (showBackground(cacheListType)) {
             insetsBuilder.withInset(new InsetBuilder(marker));
-        //}
+        } else {
+            insetsBuilder.withInset(new InsetBuilder(R.drawable.marker_list));
+        }
         // reliable or not
         if (!cache.isReliableLatLon() && showUnreliableLatLon(cacheListType)) {
             insetsBuilder.withInset(new InsetBuilder(R.drawable.marker_notreliable));
