@@ -248,7 +248,9 @@ public final class MapMarkerUtils {
         final int useEmoji = cache.getAssignedEmoji();
 
         // background: disabled or not
-        final Drawable marker = ResourcesCompat.getDrawable(res, cache.getMapMarkerId(), null);
+        // Temporarily use the same marker for everything. TODO: Redefine in connectors the icon disabled as "used in cachelist" (as inactive is done with greyscale instead)
+        //final Drawable marker = ResourcesCompat.getDrawable(res, cache.getMapMarkerId(), null);
+        final Drawable marker = ResourcesCompat.getDrawable(res, R.drawable.marker, null);
         final InsetsBuilder insetsBuilder = new InsetsBuilder(res, marker.getIntrinsicWidth(), marker.getIntrinsicHeight());
 
         // Show the background circle only on map - TODO: round marker for list
