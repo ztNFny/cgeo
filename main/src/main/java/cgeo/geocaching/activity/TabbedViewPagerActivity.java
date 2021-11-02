@@ -2,6 +2,7 @@ package cgeo.geocaching.activity;
 
 import cgeo.geocaching.R;
 import cgeo.geocaching.utils.Log;
+import cgeo.geocaching.utils.ZtnfnyUtils;
 import cgeo.geocaching.utils.functions.Action1;
 
 import android.os.Bundle;
@@ -81,7 +82,12 @@ public abstract class TabbedViewPagerActivity extends AbstractActionBarActivity 
 
         new TabLayoutMediator(findViewById(R.id.tab_layout), viewPager, (tab, position) -> {
             this.fragmentTabMap.put(position, tab);
-            tab.setText(getTitle(getItemId(position)));
+            tab.setIcon(ZtnfnyUtils.getTabIconFromTitle(getItemId(position)));
+            int badgeNum = ZtnfnyUtils.getTabIconBadge(getItemId(position), getTitle(getItemId(position)));
+            if (badgeNum > 0) {
+                tab.getOrCreateBadge().setNumber(badgeNum);
+                tab.getOrCreateBadge().setBackgroundColor(getResources().getColor(R.color.colorTextHint));
+            }
         }).attach();
     }
 

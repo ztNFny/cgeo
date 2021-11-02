@@ -39,16 +39,18 @@
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tab_layout"
-            app:tabTextColor="@color/colorTextActionBar"
-            app:tabSelectedTextColor="@color/colorAccent"
-            app:tabIndicatorColor="@color/colorAccent"
-            app:tabPaddingStart="18sp"
-            app:tabPaddingEnd="18sp"
-            app:tabMode="scrollable"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@color/colorBackground"
+            android:layout_marginRight="10sp"
+            android:layout_marginLeft="10sp"
             android:textSize="@dimen/textSize_detailsPrimary"
-            android:background="@color/colorBackgroundActionBar" />
+            app:tabGravity="fill"
+            app:tabIndicatorColor="@color/colorAccent"
+            app:tabMaxWidth="0dp"
+            app:tabMode="fixed"
+            app:tabSelectedTextColor="@color/colorAccent"
+            app:tabTextColor="@color/colorTextActionBar" />
 
     </LinearLayout>
 </RelativeLayout>
