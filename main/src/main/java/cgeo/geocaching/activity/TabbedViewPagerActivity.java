@@ -1,13 +1,18 @@
 package cgeo.geocaching.activity;
 
+import cgeo.geocaching.CacheDetailActivity;
 import cgeo.geocaching.R;
+import cgeo.geocaching.TrackableActivity;
+import cgeo.geocaching.settings.Settings;
 import cgeo.geocaching.utils.Log;
 import cgeo.geocaching.utils.OfflineTranslateUtils;
 import cgeo.geocaching.utils.functions.Action1;
 
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.core.widget.NestedScrollView;
@@ -18,10 +23,12 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
@@ -83,10 +90,78 @@ public abstract class TabbedViewPagerActivity extends AbstractActionBarActivity 
             );
         }
 
+        final HashMap<Long, Integer> cacheTabIcons = new HashMap<>();
+        cacheTabIcons.put(CacheDetailActivity.Page.VARIABLES.id, R.drawable.ic_menu_variable);
+        cacheTabIcons.put(CacheDetailActivity.Page.WAYPOINTS.id, R.drawable.cachedetails_waypoints);
+        cacheTabIcons.put(CacheDetailActivity.Page.DETAILS.id, R.drawable.settings_info);
+        cacheTabIcons.put(CacheDetailActivity.Page.DESCRIPTION.id, R.drawable.cachedetails_description);
+        cacheTabIcons.put(CacheDetailActivity.Page.LOGS.id, R.drawable.ic_menu_emoticons);
+        cacheTabIcons.put(CacheDetailActivity.Page.LOGSFRIENDS.id, R.drawable.cachedetails_friends);
+        cacheTabIcons.put(CacheDetailActivity.Page.IMAGEGALLERY.id, R.drawable.cachedetails_images);
+        cacheTabIcons.put(CacheDetailActivity.Page.INVENTORY.id, R.drawable.filter_trackable);
+        final HashMap<Long, Integer> tbTabIcons = new HashMap<>();
+        tbTabIcons.put(TrackableActivity.Page.DETAILS.id, R.drawable.settings_info);
+        tbTabIcons.put(TrackableActivity.Page.LOGS.id, R.drawable.ic_menu_emoticons);
+        tbTabIcons.put(TrackableActivity.Page.IMAGEGALLERY.id, R.drawable.cachedetails_images);
+
         new TabLayoutMediator(findViewById(R.id.tab_layout), viewPager, (tab, position) -> {
             this.fragmentTabMap.put(position, tab);
-            tab.setText(getTitle(getItemId(position)));
+            if ((this instanceof CacheDetailActivity || this instanceof TrackableActivity) && Settings.getBoolean(R.string.pref_adv_icononlytabs, true)) {
+                tab.view.setPadding(0, 0, 0, 0);
+                HashMap<Long, Integer> m = new HashMap();
+                if (this instanceof CacheDetailActivity) {
+                    m = cacheTabIcons;
+                } else if (this instanceof TrackableActivity) {
+                    m = tbTabIcons;
+                }
+                tab.setIcon(m.getOrDefault(getItemId(position), R.drawable.settings_info));
+                try {
+                    int badgeNum = Integer.parseInt(getTitle(getItemId(position)).replaceAll(".* \\(([^<]*)\\)", "$1"));
+                    if (badgeNum > 0) {
+                        tab.getOrCreateBadge().setNumber(badgeNum);
+                        tab.getOrCreateBadge().setBackgroundColor(getResources().getColor(R.color.colorTextHint));
+                    }
+                } catch (Exception e) {
+                }
+            } else {
+                tab.setText(getTitle(getItemId(position)));
+            }
         }).attach();
+
+        if ((this instanceof CacheDetailActivity || this instanceof TrackableActivity) && Settings.getBoolean(R.string.pref_adv_icononlytabs, true)) {
+            final TabLayout tl = findViewById(R.id.tab_layout);
+            tl.setTabGravity(TabLayout.GRAVITY_FILL);
+            tl.setSelectedTabIndicatorColor(res.getColor(R.color.colorAccent));
+            tl.setBackgroundColor(res.getColor(R.color.colorBackground));
+            tl.setTabMode(TabLayout.MODE_FIXED);
+
+            final int m = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 10, getResources().getDisplayMetrics());
+            final ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) tl.getLayoutParams();
+            lp.setMargins(m, 0, m, 0);
+            tl.setLayoutParams(lp);
+
+            tl.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+                @Override
+                public void onTabSelected(TabLayout.Tab tab) {
+                    BadgeDrawable badge = tab.getBadge();
+                    if (badge != null) {
+                        badge.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                    }
+                }
+
+                @Override
+                public void onTabUnselected(TabLayout.Tab tab) {
+                    BadgeDrawable badge = tab.getBadge();
+                    if (badge != null) {
+                        badge.setBackgroundColor(getResources().getColor(R.color.colorTextHint));
+                    }
+                }
+
+                @Override
+                public void onTabReselected(TabLayout.Tab tab) {
+                }
+            });
+        }
     }
 
 

@@ -666,6 +666,7 @@
     <string translatable="false" name="pref_followMyLocation">followMyLocation</string>
     <string translatable="false" name="pref_autozoom_consider_lastcenter">list_viewport_calculation_consider_lastviewport</string>
 
+    <string translatable="false" name="pref_adv_icononlytabs">adv_icononlytabs</string>
 
     <!-- ============================================================================================================================================================================== -->
     <!-- old keys, used only for migration -->
