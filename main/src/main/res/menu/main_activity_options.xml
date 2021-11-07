@@ -22,7 +22,7 @@
         android:id="@+id/menu_history"
         android:icon="@drawable/ic_menu_recent_history"
         android:title="@string/menu_history_longstring"
-        app:showAsAction="ifRoom|withText">
+        app:showAsAction="ifRoom">
     </item>
     <item
         android:id="@+id/menu_goto"

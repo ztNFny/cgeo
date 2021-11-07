@@ -6,46 +6,46 @@
         android:id="@+id/menu_show_on_map"
         android:icon="@drawable/ic_menu_mapmode"
         android:title="@string/caches_on_map"
-        app:showAsAction="ifRoom|withText"/>
+        app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/menu_filter"
         android:icon="@drawable/ic_menu_filter"
         android:title="@string/caches_filter_menuitem"
-        app:showAsAction="ifRoom|withText"/>
+        app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/menu_sort"
         android:icon="@drawable/ic_menu_sort_alphabetically"
         android:showAsAction="always"
         android:title="@string/caches_sort"
         app:actionProviderClass="cgeo.geocaching.sorting.SortActionProvider"
-        app:showAsAction="ifRoom|withText"/>
+        app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/menu_switch_select_mode"
         android:icon="@drawable/ic_menu_select_start"
         android:title="@string/caches_select_mode"
-        app:showAsAction="ifRoom|withText"/>
+        app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/menu_invert_selection"
         android:icon="@drawable/ic_menu_invert"
         android:title="@string/caches_select_invert"
-        app:showAsAction="ifRoom|withText"/>
+        app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/menu_select_next20"
         android:icon="@drawable/ic_menu_select_next"
         android:title="@string/caches_select_next20"
-        app:showAsAction="ifRoom|withText"/>
+        app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/menu_select_next100"
         android:icon="@drawable/ic_menu_select_next"
         android:title="@string/caches_select_next100"
-        app:showAsAction="ifRoom|withText"/>
+        app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/menu_cache_list_app_provider"
         android:icon="@drawable/ic_menu_navigate"
         android:title="@string/caches_on_map"
         android:visible="false"
         app:actionProviderClass="cgeo.geocaching.apps.cachelist.ListNavigationSelectionActionProvider"
-        app:showAsAction="ifRoom|withText"/>
+        app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/menu_caches"
         android:title="@string/menu_caches"
@@ -55,40 +55,40 @@
             <item
                 android:id="@+id/menu_refresh_stored"
                 android:title="@string/cache_offline_refresh"
-                app:showAsAction="ifRoom|withText"/>
+                app:showAsAction="ifRoom"/>
             <item
                 android:id="@+id/menu_move_to_list"
                 android:title="@string/cache_menu_move_list"
-                app:showAsAction="ifRoom|withText"/>
+                app:showAsAction="ifRoom"/>
             <item
                 android:id="@+id/menu_copy_to_list"
                 android:title="@string/cache_menu_copy_list"
-                app:showAsAction="ifRoom|withText"/>
+                app:showAsAction="ifRoom"/>
             <item
                 android:id="@+id/menu_drop_caches"
                 android:title="@string/caches_remove_all"
-                app:showAsAction="ifRoom|withText"/>
+                app:showAsAction="ifRoom"/>
             <item
                 android:id="@+id/menu_add_to_route"
                 android:title="@string/caches_append_to_route_all"
-                app:showAsAction="ifRoom|withText"/>
+                app:showAsAction="ifRoom"/>
             <item
                 android:id="@+id/menu_delete_events"
                 android:title="@string/caches_delete_events"
                 android:enabled="false"
-                app:showAsAction="never|withText"/>
+                app:showAsAction="never"/>
             <item
                 android:id="@+id/menu_upload_bookmarklist"
                 android:title="@string/caches_upload_bookmarklist"
-                app:showAsAction="ifRoom|withText"/>
+                app:showAsAction="ifRoom"/>
             <item
                 android:id="@+id/menu_upload_modifiedcoords"
                 android:title="@string/caches_upload_modifiedcoords"
-                app:showAsAction="ifRoom|withText"/>
+                app:showAsAction="ifRoom"/>
             <item
                 android:id="@+id/menu_upload_allcoords"
                 android:title="@string/caches_upload_allcoords"
-                app:showAsAction="ifRoom|withText"/>
+                app:showAsAction="ifRoom"/>
             <item
                 android:id="@+id/menu_clear_offline_logs"
                 android:title="@string/caches_clear_offlinelogs"
@@ -106,7 +106,7 @@
             <item
                 android:id="@+id/menu_create_internal_cache"
                 android:title="@string/create_internal_cache"
-                app:showAsAction="ifRoom|withText"/>
+                app:showAsAction="ifRoom"/>
         </menu>
     </item>
     <item
@@ -118,15 +118,15 @@
             <item
                 android:id="@+id/menu_create_list"
                 android:title="@string/list_menu_create"
-                app:showAsAction="ifRoom|withText"/>
+                app:showAsAction="ifRoom"/>
             <item
                 android:id="@+id/menu_drop_list"
                 android:title="@string/list_menu_drop"
-                app:showAsAction="ifRoom|withText"/>
+                app:showAsAction="ifRoom"/>
             <item
                 android:id="@+id/menu_rename_list"
                 android:title="@string/list_menu_rename"
-                app:showAsAction="ifRoom|withText"/>
+                app:showAsAction="ifRoom"/>
             <item
                 android:id="@+id/menu_make_list_unique"
                 android:title="@string/caches_make_list_unique"

@@ -6,20 +6,20 @@
         android:id="@+id/menu_send"
         android:icon="@drawable/ic_menu_send"
         android:title="@string/send"
-        app:showAsAction="ifRoom|withText">
+        app:showAsAction="ifRoom">
     </item>
     <item
         android:id="@+id/menu_templates"
         android:icon="@drawable/ic_menu_add"
         android:title="@string/log_add"
-        app:showAsAction="ifRoom|withText">
+        app:showAsAction="ifRoom">
         <menu /> <!-- filled dynamically -->
     </item>
     <item
         android:id="@+id/menu_smileys"
         android:icon="@drawable/ic_menu_emoticons"
         android:title="@string/log_smilies"
-        app:showAsAction="ifRoom|withText">
+        app:showAsAction="ifRoom">
         <menu /> <!-- filled dynamically -->
     </item>
     <item
@@ -27,12 +27,12 @@
         android:icon="@drawable/ic_menu_save"
         android:title="@string/log_save"
         android:visible="false"
-        app:showAsAction="ifRoom|withText">
+        app:showAsAction="ifRoom">
     </item>
     <item
         android:id="@+id/menu_sort_trackables_by"
         android:title="@string/log_tb_sortby"
-        app:showAsAction="ifRoom|withText">
+        app:showAsAction="ifRoom">
         <menu>
             <group
                 android:id="@+id/menu_group_sort_trackables"
@@ -52,14 +52,14 @@
     <item
         android:id="@+id/menu_repeat_last"
         android:title="@string/log_repeat"
-        app:showAsAction="ifRoom|withText">
+        app:showAsAction="ifRoom">
     </item>
     <item
         android:id="@+id/clear"
         android:icon="@drawable/ic_menu_delete"
         android:title="@string/log_clear"
         android:visible="false"
-        app:showAsAction="ifRoom|withText">
+        app:showAsAction="ifRoom">
     </item>
 
 </menu>
