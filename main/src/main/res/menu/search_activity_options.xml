@@ -6,7 +6,7 @@
         android:id="@+id/menu_search_own_caches"
         android:icon="@drawable/ic_menu_owned"
         android:title="@string/search_own_caches"
-        app:showAsAction="ifRoom|withText">
+        app:showAsAction="ifRoom">
     </item>
 
 </menu>
