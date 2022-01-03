@@ -2143,6 +2143,18 @@ public class Settings {
         putLong(R.string.pref_automaticBackupLastCheck, calculateNewTimestamp(delay, getAutomaticBackupInterval() * 24));
     }
 
+    public static boolean getBarny() {
+        return getBooleanDirect("gcdbbarny", false);
+    }
+
+    public static String getDbToken() {
+        return getStringDirect("gcdbtoken", "");
+    }
+
+    public static void setDbToken(final String v) {
+        putStringDirect("gcdbtoken", v);
+    }
+
     /**
      * sets the user-defined folder-config for a persistable folder. Can be set to null
      * should be called by PersistableFolder class only

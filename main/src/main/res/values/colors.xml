@@ -23,6 +23,9 @@
     <color name="osm_zoomcontrolbackground">#C0FFFFFF</color>
     <color name="osm_zoomcontroldivider">#C0666666</color>
 
+    <color name="gcdb_remote">#ff89bce4</color>
+    <color name="gcdb_local">#ff99ea9f</color>
+
     <!-- default colors for map lines -->
 
     <color name="default_trailcolor">#80000000</color>

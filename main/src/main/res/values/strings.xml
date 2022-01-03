@@ -3263,6 +3263,8 @@
     <string name="rtl_path_quality23">quality 2/3 (paved: gravel, repaired, …)</string>
     <string name="rtl_path_quality45">quality 4/5 (unpaved)</string>
 
+    <string name="gcdb_diff_title">GCT Compare</string>
+
     <!-- Smileys GC / OC -->
     <string name="smiley_smile">Smiley</string>
     <string name="smiley_big_smile">Big Smile</string>

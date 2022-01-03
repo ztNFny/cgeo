@@ -106,6 +106,8 @@ import cgeo.geocaching.utils.ProgressButtonDisposableHandler;
 import cgeo.geocaching.utils.ShareUtils;
 import cgeo.geocaching.utils.SimpleDisposableHandler;
 import cgeo.geocaching.utils.TextUtils;
+import cgeo.geocaching.utils.UnknownTagsHandler;
+import cgeo.geocaching.utils.ZtnfnyGcDb;
 import cgeo.geocaching.utils.functions.Action1;
 import cgeo.geocaching.utils.html.HtmlStyle;
 import cgeo.geocaching.utils.html.HtmlUtils;
@@ -895,7 +897,7 @@ public class CacheDetailActivity extends TabbedViewPagerActivity
 
     }
 
-    private void notifyDataSetChanged() {
+    public void notifyDataSetChanged() {
         // This might get called asynchronous when the activity is shut down
         if (isFinishing()) {
             return;
@@ -1292,6 +1294,12 @@ public class CacheDetailActivity extends TabbedViewPagerActivity
             binding.addToFavpoint.setOnClickListener(new FavoriteAddClickListener());
             binding.removeFromFavpoint.setOnClickListener(new FavoriteRemoveClickListener());
             updateFavPointBox(activity);
+
+            if (Settings.getBarny()) {
+                ZtnfnyGcDb.checkBarnyAvailability(binding.checkBarny, cache);
+            }
+            ZtnfnyGcDb.getDbHistory(binding.gcdbHistory, cache);
+            ZtnfnyGcDb.syncDb(binding.gcdbSync, cache);
 
             // data license
             final IConnector connector = ConnectorFactory.getConnector(cache);
