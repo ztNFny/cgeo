@@ -37,6 +37,10 @@ public class StatusFragment extends Fragment {
                         return;
                     }
 
+                    if ("This is a test message! it could also be a notification about an available new version or about a temporary problem.".equals(status.message)) {
+                        return;
+                    }
+
                     final Resources res = getResources();
                     final String packageName = getActivity().getPackageName();
 
