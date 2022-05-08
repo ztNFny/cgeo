@@ -53,18 +53,6 @@
         android:visible="false">
     </item>
     <item
-        android:id="@+id/menu_tts_toggle"
-        android:icon="@drawable/ic_menu_text_to_speech_off"
-        android:title="@string/cache_menu_speechActivate"
-        android:visible="false"
-        app:showAsAction="ifRoom">
-    </item>
-    <item
-        android:id="@+id/menu_caches_around_from_popup"
-        android:title="@string/cache_menu_around"
-        android:visible="false">
-    </item>
-    <item
         android:id="@+id/menu_show_in_browser"
         android:icon="@drawable/ic_menu_info_details"
         android:title="@string/cache_menu_browser"
@@ -78,12 +66,6 @@
     <item
         android:id="@+id/menu_challenge_checker"
         android:title="@string/cache_menu_challenge_checker"
-        android:visible="false"
-        app:showAsAction="ifRoom">
-    </item>
-    <item
-        android:id="@+id/menu_log_in_browser"
-        android:title="@string/cache_menu_log_in_browser"
         android:visible="false"
         app:showAsAction="ifRoom">
     </item>
@@ -170,15 +152,6 @@
                 android:visible="false">
             </item>
             <item
-                android:id="@+id/menu_caches_around"
-                android:title="@string/cache_menu_around">
-            </item>
-            <item
-                android:id="@+id/menu_gcvote"
-                android:title="@string/cache_menu_vote"
-                android:visible="false">
-            </item>
-            <item
                 android:id="@+id/menu_ignore"
                 android:title="@string/cache_menu_ignore"
                 android:visible="false">
@@ -197,6 +170,41 @@
                 android:id="@+id/menu_change_description_style"
                 android:title="@string/cache_menu_change_description_style"
                 android:visible="true">
+            </item>
+        </menu>
+    </item>
+    <item
+        android:id="@+id/menu_hidden"
+        android:title="Hidden items"
+        app:showAsAction="never"
+        android:visible="false">
+        <menu>
+            <item
+                android:id="@+id/menu_tts_toggle"
+                android:icon="@drawable/ic_menu_text_to_speech_off"
+                android:title="@string/cache_menu_speechActivate"
+                android:visible="false"
+                app:showAsAction="ifRoom">
+            </item>
+            <item
+                android:id="@+id/menu_caches_around_from_popup"
+                android:title="@string/cache_menu_around"
+                android:visible="false">
+            </item>
+            <item
+                android:id="@+id/menu_log_in_browser"
+                android:title="@string/cache_menu_log_in_browser"
+                android:visible="false"
+                app:showAsAction="ifRoom">
+            </item>
+            <item
+                android:id="@+id/menu_caches_around"
+                android:title="@string/cache_menu_around">
+            </item>
+            <item
+                android:id="@+id/menu_gcvote"
+                android:title="@string/cache_menu_vote"
+                android:visible="false">
             </item>
         </menu>
     </item>
