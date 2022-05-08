@@ -143,7 +143,7 @@ public class ZtnfnyGcDb {
                 } else if (!gcDbTransaction.hasCacheHasPersonalNote() && !cache.hasUserModifiedCoords() && dbInfo != null) {
                     doDownload();
                 } else if (gcDbTransaction.hasCacheHasPersonalNote() && cache.hasUserModifiedCoords()) {
-                    doUpload();
+                    showUploadConfirmationDialog("");
                 } else {
                     Toast.makeText(v.getContext(), "No results", Toast.LENGTH_LONG);
                 }
@@ -290,8 +290,17 @@ public class ZtnfnyGcDb {
     }
 
     private static void showUploadConfirmationDialog(final String dialogText) {
+        final String localCoords = gcDbTransaction.getCache().getCoords().format(GeopointFormatter.Format.LAT_LON_DECMINUTE_RAW);
+        final String localTxt = gcDbTransaction.getCachePersonalNote();
+        final SpannableStringBuilder ssb = new SpannableStringBuilder();
+        if (!"".equals(dialogText)) {
+            ssb.append(dialogText).append("\n\n");
+        }
+        ssb.append(localCoords).append("\n\n");
+        ssb.append(localTxt);
+
         final View v = LayoutInflater.from(gcDbTransaction.getCtx()).inflate(R.layout.gcdb_diffdialog, null);
-        ((TextView) v.findViewById(R.id.gcdb_diff)).setText(dialogText, TextView.BufferType.SPANNABLE);
+        ((TextView) v.findViewById(R.id.gcdb_diff)).setText(ssb, TextView.BufferType.SPANNABLE);
         Dialog dialog = Dialogs.bottomSheetDialogWithActionbar(gcDbTransaction.getCtx(), v, R.string.gcdb_diff_title);
         dialog.show();
         final Button downloadButton = v.findViewById(R.id.gcdb_download_remote);
