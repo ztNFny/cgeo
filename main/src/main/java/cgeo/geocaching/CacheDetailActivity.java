@@ -670,6 +670,7 @@ public class CacheDetailActivity extends TabbedViewPagerActivity
         final IConnector connector = null != cache ? ConnectorFactory.getConnector(cache) : null;
         final boolean isUDC = null != connector && connector.equals(InternalConnector.getInstance());
 
+        ViewUtils.extendMenuActionBarDisplayItemCount(this, menu);
         CacheMenuHandler.onPrepareOptionsMenu(menu, cache, false);
         LoggingUI.onPrepareOptionsMenu(menu, cache);
 
