@@ -2521,7 +2521,7 @@ public class CacheDetailActivity extends TabbedViewPagerActivity
                 pages.add(Page.LOGSFRIENDS.id);
             }
             if (CollectionUtils.isNotEmpty(cache.getInventory()) || CollectionUtils.isNotEmpty(genericTrackables)) {
-                pages.add(Page.INVENTORY.id);
+                //pages.add(Page.INVENTORY.id);
             }
             pages.add(Page.IMAGEGALLERY.id);
         }
