@@ -1,25 +1,14 @@
-<!-- Taken from https://de.wikipedia.org/wiki/Datei:Google_Maps_pin.svg -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:viewportWidth="20"
-    android:viewportHeight="34.89234"
-    android:width="20dp"
-    android:height="34.89234dp">
-    <group
-        android:translateX="-814.596"
-        android:translateY="-274.3862">
-        <group
-            android:scaleX="1.185585"
-            android:scaleY="1.185585"
-            android:translateX="-151.1772"
-            android:translateY="-57.3976">
-            <path
-                android:pathData="M817.11249 282.97118c-1.25816 1.34277 -2.04623 3.29881 -2.01563 5.13867 0.0639 3.84476 1.79693 5.3002 4.56836 10.59179 0.99832 2.32851 2.04027 4.79237 3.03125 8.87305 0.13772 0.60193 0.27203 1.16104 0.33416 1.20948 0.0621 0.0485 0.19644 -0.51262 0.33416 -1.11455 0.99098 -4.08068 2.03293 -6.54258 3.03125 -8.87109 2.77143 -5.29159 4.50444 -6.74704 4.56836 -10.5918 0.0306 -1.83986 -0.75942 -3.79785 -2.01758 -5.14062 -1.43724 -1.53389 -3.60504 -2.66908 -5.91619 -2.71655 -2.31115 -0.0475 -4.4809 1.08773 -5.91814 2.62162z"
-                android:fillColor="#FF4646"
-                android:strokeColor="#D73534"
-                android:strokeWidth="1" />
-            <path
-                android:pathData="M826.0661 288.2528A3.0355 3.0355 0 0 1 819.9951 288.2528A3.0355 3.0355 0 0 1 826.0661 288.2528Z"
-                android:fillColor="#590000" />
-        </group>
-    </group>
+    android:width="36dp"
+    android:height="36dp"
+    android:viewportWidth="36"
+    android:viewportHeight="36">
+  <path
+      android:pathData="m24.322,19.813v-12.65h1.5805v-3.1625h-15.805v3.1625h1.5805v12.65l-3.1609,3.1625v3.1625h8.2184v9.4875h2.5287v-9.4875h8.2184v-3.1625z"
+      android:strokeWidth=".75"
+      android:fillColor="@color/cacheMarker_icon"
+      android:strokeColor="@color/cacheMarker_border"/>
+  <path
+      android:pathData="m22.02,20.762v-14.462h-8.045c0,7.1291 -0,8.9891 0,14.469l-2.3666,2.3666 -0.0029,0.7116c13.372,-0.0182 -0.5693,0.0092 12.785,0l0.0031,-0.7116z"
+      android:fillColor="@color/cacheType_cgeo"/>
 </vector>
