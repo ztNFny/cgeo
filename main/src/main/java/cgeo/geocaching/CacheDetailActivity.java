@@ -96,6 +96,7 @@ import cgeo.geocaching.utils.CryptUtils;
 import cgeo.geocaching.utils.DisposableHandler;
 import cgeo.geocaching.utils.EmojiUtils;
 import cgeo.geocaching.utils.Formatter;
+import cgeo.geocaching.utils.HtmlUtils;
 import cgeo.geocaching.utils.ImageUtils;
 import cgeo.geocaching.utils.LocalizationUtils;
 import cgeo.geocaching.utils.Log;
@@ -105,6 +106,7 @@ import cgeo.geocaching.utils.ShareUtils;
 import cgeo.geocaching.utils.SimpleDisposableHandler;
 import cgeo.geocaching.utils.SimpleHandler;
 import cgeo.geocaching.utils.TextUtils;
+import cgeo.geocaching.utils.TranslationUtils;
 import cgeo.geocaching.utils.UnknownTagsHandler;
 import cgeo.geocaching.utils.functions.Action1;
 import static cgeo.geocaching.apps.cache.WhereYouGoApp.getWhereIGoUrl;
@@ -1651,6 +1653,7 @@ public class CacheDetailActivity extends TabbedViewPagerActivity
      * Reflect the (contextual) action mode of the action bar.
      */
     protected ActionMode currentActionMode;
+    protected android.view.ActionMode actionMode;
 
     public static class DescriptionViewCreator extends TabbedViewPagerFragment<CachedetailDescriptionPageBinding> {
 
@@ -2460,12 +2463,27 @@ public class CacheDetailActivity extends TabbedViewPagerActivity
     }
 
     @Override
+    public void onActionModeStarted(android.view.ActionMode mode) {
+        Menu menus = mode.getMenu();
+        getMenuInflater().inflate(R.menu.details_context, menus);
+        menus.add(0,1,0,"test");
+        super.onActionModeStarted(mode);
+    }
+
+    public void onActionItemClicked(MenuItem item) {
+        final int itemId = item.getItemId();
+        if (itemId == R.id.menu_extract_waypoints) {
+            extractWaypoints(clickedItemText, cache);
+        }
+    }
+
+    @Override
     public void addContextMenu(final View view) {
         view.setOnLongClickListener(v -> {
             if (view.getId() == R.id.description || view.getId() == R.id.hint) {
                 selectedTextView = (IndexOutOfBoundsAvoidingTextView) view;
                 mSelectionModeActive = true;
-                return false;
+                return true;
             }
             currentActionMode = startSupportActionMode(new ActionMode.Callback() {
 
@@ -2491,7 +2509,9 @@ public class CacheDetailActivity extends TabbedViewPagerActivity
                         } else {
                             clickedItemText = shortDesc + "\n\n" + cache.getDescription();
                         }
-                        buildDetailsContextMenu(actionMode, menu, res.getString(R.string.cache_description), false);
+                        //buildDetailsContextMenu(actionMode, menu, res.getString(R.string.cache_description), false);
+    menu.add(0,1,0,"test2");
+                        getMenuInflater().inflate(R.menu.details_context, menu);
                     } else if (viewId == R.id.personalnote) {
                         clickedItemText = cache.getPersonalNote();
                         buildDetailsContextMenu(actionMode, menu, res.getString(R.string.cache_personal_note), true);
@@ -2522,8 +2542,8 @@ public class CacheDetailActivity extends TabbedViewPagerActivity
 
                 @Override
                 public boolean onCreateActionMode(final ActionMode actionMode, final Menu menu) {
-                    actionMode.getMenuInflater().inflate(R.menu.details_context, menu);
-                    prepareClipboardActionMode(view, actionMode, menu);
+                    //actionMode.getMenuInflater().inflate(R.menu.details_context, menu);
+                    //prepareClipboardActionMode(view, actionMode, menu);
                     // Return true so that the action mode is shown
                     return true;
                 }
