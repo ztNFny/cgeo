@@ -52,6 +52,7 @@ import cgeo.geocaching.utils.ImageUtils;
 import cgeo.geocaching.utils.LazyInitializedList;
 import cgeo.geocaching.utils.LazyInitializedSet;
 import cgeo.geocaching.utils.Log;
+import cgeo.geocaching.utils.MapMarkerUtils;
 import cgeo.geocaching.utils.MatcherWrapper;
 import cgeo.geocaching.utils.ShareUtils;
 import cgeo.geocaching.utils.functions.Func1;
@@ -600,6 +601,7 @@ public class Geocache implements IWaypoint {
             if (Settings.removeFromRouteOnLog()) {
                 new IndividualRoute().removeGeocache(geocode);
             }
+            MapMarkerUtils.resetCache();
             offlineLog = logEntry;
             notifyChange();
         } else {

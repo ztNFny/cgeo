@@ -52,11 +52,18 @@ public final class MapMarkerUtils {
 
     private static final SparseArray<CacheMarker> overlaysCache = new SparseArray<>();
     private static final Map<String, EmojiUtils.EmojiPaint> emojiPaintMap = new HashMap<>();
-    private static final float scalingFactorCacheIcons = Settings.getLong(R.string.pref_mapCacheScale, 100) / 100.0f;
-    private static final float scalingFactorWpIcons = Settings.getLong(R.string.pref_mapWpScale, 100) / 100.0f;
+    private static float scalingFactorCacheIcons = Settings.getLong(R.string.pref_mapCacheScale, 100) / 100.0f;
+    private static float scalingFactorWpIcons = Settings.getLong(R.string.pref_mapWpScale, 100) / 100.0f;
 
     private MapMarkerUtils() {
         // Do not instantiate
+    }
+
+    public synchronized static void resetCache() {
+        overlaysCache.clear();
+        emojiPaintMap.clear();
+        scalingFactorCacheIcons = Settings.getLong(R.string.pref_mapCacheScale, 100) / 100.0f;
+        scalingFactorWpIcons = Settings.getLong(R.string.pref_mapWpScale, 100) / 100.0f;
     }
 
     /**
