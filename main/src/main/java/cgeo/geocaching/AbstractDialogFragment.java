@@ -7,7 +7,10 @@ import cgeo.geocaching.activity.INavigationSource;
 import cgeo.geocaching.enumerations.LoadFlags;
 import cgeo.geocaching.location.Geopoint;
 import cgeo.geocaching.location.Units;
+import cgeo.geocaching.log.LogType;
 import cgeo.geocaching.log.LoggingUI;
+import cgeo.geocaching.log.ReportProblemType;
+import cgeo.geocaching.maps.MapUtils;
 import cgeo.geocaching.models.Geocache;
 import cgeo.geocaching.sensors.GeoData;
 import cgeo.geocaching.sensors.GeoDirHandler;
@@ -17,8 +20,10 @@ import cgeo.geocaching.ui.ViewUtils;
 import cgeo.geocaching.utils.Log;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.view.Menu;
@@ -174,7 +179,7 @@ public abstract class AbstractDialogFragment extends Fragment implements CacheMe
         ((AbstractNavigationBarMapActivity) requireActivity()).sheetRemoveFragment();
     }
 
-    public static void onCreatePopupOptionsMenu(final Toolbar toolbar, final INavigationSource navigationSource, final Geocache geocache) {
+    public void onCreatePopupOptionsMenu(final Toolbar toolbar, final INavigationSource navigationSource, final Geocache geocache) {
         final Menu menu = toolbar.getMenu();
         menu.clear();
         toolbar.inflateMenu(R.menu.cache_options);
@@ -183,11 +188,28 @@ public abstract class AbstractDialogFragment extends Fragment implements CacheMe
         ViewUtils.extendMenuActionBarDisplayItemCount(toolbar.getContext(), menu);
         menu.findItem(R.id.menu_target).setVisible(true);
         LoggingUI.onPrepareOptionsMenu(menu, geocache);
+
+        // add Quick Found Log Listener
+        new Handler().post(() -> {
+            final View offlineLogButton = toolbar.findViewById(R.id.menu_log_visit_offline);
+            if (offlineLogButton != null) {
+                offlineLogButton.setOnLongClickListener(v -> {
+                    LoggingUI.onMenuItemSelected(menu.findItem(R.id.menu_log_visit_offline), getActivity(), geocache, dialog -> init());
+                    return true;
+                });
+                menu.findItem(R.id.menu_log_visit_offline).setIcon(R.drawable.cachedetails_logbook);
+            }
+        });
     }
 
     public boolean onPopupOptionsItemSelected(@NonNull final MenuItem item) {
         if (item.getItemId() == R.id.menu_target) {
             setAsTarget();
+            return true;
+        }
+
+        if (item.getItemId() == R.id.menu_log_visit_offline) {
+            cache.logOffline(requireActivity(), cache.getDefaultLogType(), ReportProblemType.NO_PROBLEM);
             return true;
         }
 
