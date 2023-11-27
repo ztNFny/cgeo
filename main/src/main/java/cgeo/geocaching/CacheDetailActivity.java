@@ -1299,7 +1299,7 @@ public class CacheDetailActivity extends TabbedViewPagerActivity
                 ZtnfnyGcDb.checkBarnyAvailability(binding.checkBarny, cache);
             }
             ZtnfnyGcDb.getDbHistory(binding.gcdbHistory, cache);
-            ZtnfnyGcDb.syncDb(binding.gcdbSync, cache);
+            ZtnfnyGcDb.syncDb(binding.gcdbSync, cache, false);
 
             // data license
             final IConnector connector = ConnectorFactory.getConnector(cache);

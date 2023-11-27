@@ -10,10 +10,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import androidx.annotation.RequiresApi;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -26,6 +25,7 @@ import com.github.difflib.UnifiedDiffUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -37,6 +37,8 @@ import cgeo.geocaching.CgeoApplication;
 import cgeo.geocaching.R;
 import cgeo.geocaching.enumerations.LoadFlags;
 import cgeo.geocaching.enumerations.WaypointType;
+import cgeo.geocaching.export.BatchUploadModifiedCoordinates;
+import cgeo.geocaching.export.PersonalNoteExport;
 import cgeo.geocaching.location.Geopoint;
 import cgeo.geocaching.location.GeopointFormatter;
 import cgeo.geocaching.models.Geocache;
@@ -72,11 +74,19 @@ public class ZtnfnyGcDb {
     }
     private static GcDbTransaction gcDbTransaction;
 
-    private static void doUpload() {
+    private static void doUpload(final boolean uploadToGC) {
         callGcDbApi("upload");
+
+        if (uploadToGC) { syncWithGc(); }
     }
 
-    private static void doDownload() {
+    private static void syncWithGc() {
+        final Geocache cache = gcDbTransaction.getCache();
+        new PersonalNoteExport().export(Collections.singletonList(cache), null);
+        new BatchUploadModifiedCoordinates(true).export(Collections.singletonList(cache), null);
+    }
+
+    private static void doDownload(final boolean uploadToGC) {
         final Geocache cache = gcDbTransaction.getCache();
         final GcDbInfo dbInfo = gcDbTransaction.getDbInfo();
 
@@ -87,7 +97,7 @@ public class ZtnfnyGcDb {
         }
 
         // Delete old DB waypoints
-        List<Waypoint> waypointList = cache.getWaypoints();
+        final List<Waypoint> waypointList = cache.getWaypoints();
         for (Waypoint waypoint : waypointList) {
             if ("DB".equals(waypoint.getName())) {
                 cache.deleteWaypoint(waypoint);
@@ -110,43 +120,42 @@ public class ZtnfnyGcDb {
         cache.setCoords(dbInfo.getGeopoint());
 
         saveAndRefresh(cache);
+
+        if (uploadToGC) { syncWithGc(); }
     }
 
-    public static void syncDb(final Button btn, final Geocache cache) {
+    public static void syncDb(final Button btn, final Geocache cache, final boolean uploadToGC) {
         final TextView status = (TextView) ((ViewGroup)btn.getParent()).getChildAt(0);
         gcDbTransaction = new GcDbTransaction(cache, status, btn.getContext());
-        btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final TextView status = gcDbTransaction.getStatus();
+        btn.setOnClickListener(v -> {
+            final TextView status1 = gcDbTransaction.getStatus();
 
-                // get DB
-                final GcDbInfo dbInfo;
-                final GcDbInfo[] dbInfos = callGcDbApi("download");
-                if (dbInfos == null || dbInfos[0] == null) {
-                    dbInfo = null;
-                } else {
-                    dbInfo = dbInfos[0];
+            // get DB
+            final GcDbInfo dbInfo;
+            final GcDbInfo[] dbInfos = callGcDbApi("download");
+            if (dbInfos == null || dbInfos[0] == null) {
+                dbInfo = null;
+            } else {
+                dbInfo = dbInfos[0];
+            }
+            gcDbTransaction.setDbInfo(dbInfo);
+            if ((cache.hasUserModifiedCoords() || gcDbTransaction.hasCacheHasPersonalNote()) && dbInfo != null) {
+                // local and remote set
+                if (gcDbTransaction.coordsMatch() && gcDbTransaction.getCachePersonalNote().equals(dbInfo.getUsernote())) {
+                    setStatus(status1, R.drawable.marker_disable, "Coordinates & Note already match");
+                    return;
                 }
-                gcDbTransaction.setDbInfo(dbInfo);
-                if ((cache.hasUserModifiedCoords() || gcDbTransaction.hasCacheHasPersonalNote()) && dbInfo != null) {
-                    // local and remote set
-                    if (gcDbTransaction.coordsMatch() && gcDbTransaction.getCachePersonalNote().equals(dbInfo.getUsernote())) {
-                        setStatus(status, R.drawable.marker_disable, "Coordinates & Note already match");
-                        return;
-                    }
-                    showDiffDialog();
-                } else if (!gcDbTransaction.hasCacheHasPersonalNote() && cache.hasUserModifiedCoords()) {
-                    showUploadConfirmationDialog("Usernote is empty. Upload to DB?");
-                } else if (gcDbTransaction.hasCacheHasPersonalNote() && !cache.hasUserModifiedCoords()) {
-                    showUploadConfirmationDialog("No corrected coordinates, only Note. Upload to DB?");
-                } else if (!gcDbTransaction.hasCacheHasPersonalNote() && !cache.hasUserModifiedCoords() && dbInfo != null) {
-                    doDownload();
-                } else if (gcDbTransaction.hasCacheHasPersonalNote() && cache.hasUserModifiedCoords()) {
-                    showUploadConfirmationDialog("");
-                } else {
-                    Toast.makeText(v.getContext(), "No results", Toast.LENGTH_LONG);
-                }
+                showDiffDialog();
+            } else if (!gcDbTransaction.hasCacheHasPersonalNote() && !cache.hasUserModifiedCoords() && dbInfo != null) {
+                showConfirmationDialog("", true);
+            } else if (!gcDbTransaction.hasCacheHasPersonalNote() && cache.hasUserModifiedCoords()) {
+                showConfirmationDialog("Usernote is empty. Upload to DB?", false);
+            } else if (gcDbTransaction.hasCacheHasPersonalNote() && !cache.hasUserModifiedCoords()) {
+                showConfirmationDialog("No corrected coordinates, only Note. Upload to DB?", false);
+            } else if (gcDbTransaction.hasCacheHasPersonalNote() && cache.hasUserModifiedCoords()) {
+                showConfirmationDialog("", false);
+            } else {
+                Toast.makeText(v.getContext(), "No results", Toast.LENGTH_LONG);
             }
         });
     }
@@ -154,55 +163,48 @@ public class ZtnfnyGcDb {
     public static void getDbHistory(final Button btn, final Geocache cache) {
         final TextView status = (TextView) ((ViewGroup)btn.getParent()).getChildAt(0);
         gcDbTransaction = new GcDbTransaction(cache, status, btn.getContext());
-        btn.setOnClickListener(new View.OnClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.N)
-            @Override
-            public void onClick(View v) {
-                // get DB
-                final GcDbInfo[] dbInfos = callGcDbApi("history");
+        btn.setOnClickListener(v -> {
+            // get DB
+            final GcDbInfo[] dbInfos = callGcDbApi("history");
 
-                if (dbInfos == null || dbInfos.length == 0) return;
+            if (dbInfos == null || dbInfos.length == 0) return;
 
-                // Delete old DB waypoints
-                List<Waypoint> waypointList = cache.getWaypoints();
-                for (Waypoint waypoint : waypointList) {
-                    if (waypoint.getName().startsWith("DB v")) {
-                        cache.deleteWaypoint(waypoint);
-                    }
+            // Delete old DB waypoints
+            List<Waypoint> waypointList = cache.getWaypoints();
+            for (Waypoint waypoint : waypointList) {
+                if (waypoint.getName().startsWith("DB v")) {
+                    cache.deleteWaypoint(waypoint);
                 }
-
-                for (GcDbInfo dbInfo : dbInfos) {
-                    final Waypoint wp = new Waypoint("DB v" + dbInfo.version + " (" + dbInfo.datetime + ")", WaypointType.FINAL, true);
-                    wp.setNote(dbInfo.getUsernote());
-                    wp.setCoords(dbInfo.getGeopoint());
-                    cache.addOrChangeWaypoint(wp, true);
-                }
-
-                saveAndRefresh(cache);
-
-                setStatus(status, R.drawable.marker_visited, dbInfos.length + " history waypoints added. Hold this button to delete them again.");
             }
+
+            for (GcDbInfo dbInfo : dbInfos) {
+                final Waypoint wp = new Waypoint("DB v" + dbInfo.version + " (" + dbInfo.datetime + ")", WaypointType.FINAL, true);
+                wp.setNote(dbInfo.getUsernote());
+                wp.setCoords(dbInfo.getGeopoint());
+                cache.addOrChangeWaypoint(wp, true);
+            }
+
+            saveAndRefresh(cache);
+
+            setStatus(status, R.drawable.marker_visited, dbInfos.length + " history waypoints added. Hold this button to delete them again.");
         });
-        btn.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                int delCount = 0;
+        btn.setOnLongClickListener(v -> {
+            int delCount = 0;
 
-                // Delete old DB waypoints
-                List<Waypoint> waypointList = cache.getWaypoints();
-                for (Waypoint waypoint : waypointList) {
-                    if (waypoint.getName().startsWith("DB v")) {
-                        cache.deleteWaypoint(waypoint);
-                        delCount++;
-                    }
+            // Delete old DB waypoints
+            List<Waypoint> waypointList = cache.getWaypoints();
+            for (Waypoint waypoint : waypointList) {
+                if (waypoint.getName().startsWith("DB v")) {
+                    cache.deleteWaypoint(waypoint);
+                    delCount++;
                 }
-
-                saveAndRefresh(cache);
-                setStatus(status, R.drawable.marker_visited, delCount + " history waypoints removed.");
-
-                // consume the event as not to fire click-listener
-                return true;
             }
+
+            saveAndRefresh(cache);
+            setStatus(status, R.drawable.marker_visited, delCount + " history waypoints removed.");
+
+            // consume the event as not to fire click-listener
+            return true;
         });
     }
 
@@ -272,46 +274,58 @@ public class ZtnfnyGcDb {
         Dialog dialog = Dialogs.bottomSheetDialogWithActionbar(gcDbTransaction.getCtx(), v, R.string.gcdb_diff_title);
         dialog.show();
         final Button downloadButton = v.findViewById(R.id.gcdb_download_remote);
-        downloadButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                doDownload();
-                dialog.dismiss();
-            }
-        });
+        final CheckBox uploadToGcChkBox = v.findViewById(R.id.gcdb_upload_to_gc);
+        uploadToGcChkBox.setChecked(Settings.getGcDbUploadToGc());
         final Button uploadButton = v.findViewById(R.id.gcdb_upload_local);
-        uploadButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                doUpload();
-                dialog.dismiss();
-            }
+        downloadButton.setOnClickListener(b -> {
+            doDownload(uploadToGcChkBox.isChecked());
+            dialog.dismiss();
+        });
+        uploadButton.setOnClickListener(b -> {
+            doUpload(uploadToGcChkBox.isChecked());
+            dialog.dismiss();
+        });
+        uploadToGcChkBox.setOnClickListener(b -> {
+            Settings.setGcDbUploadToGc(uploadToGcChkBox.isChecked());
         });
     }
 
-    private static void showUploadConfirmationDialog(final String dialogText) {
-        final String localCoords = gcDbTransaction.getCache().getCoords().format(GeopointFormatter.Format.LAT_LON_DECMINUTE_RAW);
-        final String localTxt = gcDbTransaction.getCachePersonalNote();
-        final SpannableStringBuilder ssb = new SpannableStringBuilder();
-        if (!"".equals(dialogText)) {
-            ssb.append(dialogText).append("\n\n");
+    private static void showConfirmationDialog(final String dialogText, final boolean isDownload) {
+        final String coords;
+        final String txt;
+        if (isDownload) {
+            coords = gcDbTransaction.getCache().getCoords().format(GeopointFormatter.Format.LAT_LON_DECMINUTE_RAW);
+            txt = gcDbTransaction.getDbInfo().getUsernote();
+        } else {
+            coords = gcDbTransaction.getCache().getCoords().format(GeopointFormatter.Format.LAT_LON_DECMINUTE_RAW);
+            txt = gcDbTransaction.getCachePersonalNote();
         }
-        ssb.append(localCoords).append("\n\n");
-        ssb.append(localTxt);
+
+        final SpannableStringBuilder ssb = new SpannableStringBuilder();
+        ssb.append(coords).append("\n\n");
+        ssb.append(txt);
 
         final View v = LayoutInflater.from(gcDbTransaction.getCtx()).inflate(R.layout.gcdb_diffdialog, null);
         ((TextView) v.findViewById(R.id.gcdb_diff)).setText(ssb, TextView.BufferType.SPANNABLE);
         Dialog dialog = Dialogs.bottomSheetDialogWithActionbar(gcDbTransaction.getCtx(), v, R.string.gcdb_diff_title);
+        dialog.setTitle(dialogText);
         dialog.show();
         final Button downloadButton = v.findViewById(R.id.gcdb_download_remote);
-        downloadButton.setVisibility(View.GONE);
+        downloadButton.setVisibility(isDownload ? View.VISIBLE : View.GONE);
+        final CheckBox uploadToGcChkBox = v.findViewById(R.id.gcdb_upload_to_gc);
+        uploadToGcChkBox.setChecked(Settings.getGcDbUploadToGc());
         final Button uploadButton = v.findViewById(R.id.gcdb_upload_local);
-        uploadButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                doUpload();
-                dialog.dismiss();
-            }
+        uploadButton.setVisibility(!isDownload ? View.VISIBLE : View.GONE);
+        downloadButton.setOnClickListener(b -> {
+            doDownload(uploadToGcChkBox.isChecked());
+            dialog.dismiss();
+        });
+        uploadButton.setOnClickListener(b -> {
+            doUpload(uploadToGcChkBox.isChecked());
+            dialog.dismiss();
+        });
+        uploadToGcChkBox.setOnClickListener(b -> {
+            Settings.setGcDbUploadToGc(uploadToGcChkBox.isChecked());
         });
     }
 
@@ -393,23 +407,20 @@ public class ZtnfnyGcDb {
     public static void checkBarnyAvailability(final Button btn, final Geocache cache) {
         btn.setVisibility(View.VISIBLE);
         final TextView status = (TextView) ((ViewGroup)btn.getParent()).getChildAt(0);
-        btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                RequestBody requestBody = new FormBody.Builder()
-                    .add("gccode", cache.getGeocode())
-                    .build();
-                final Request.Builder request = new Request.Builder().url("https://barnyruilt.alwaysdata.net/").post(requestBody);
-                final Response response = RxOkHttpUtils.request(OK_HTTP_CLIENT, request.build()).blockingGet();
-                if (response.code() == 200) {
-                    final String jsonString = Network.getResponseData(response);
-                    if (jsonString.contains("hasCorrected\": true")) {
-                        setStatus(status, R.drawable.marker_found, "Barny Available");
-                        return;
-                    }
+        btn.setOnClickListener(v -> {
+            RequestBody requestBody = new FormBody.Builder()
+                .add("gccode", cache.getGeocode())
+                .build();
+            final Request.Builder request = new Request.Builder().url("https://barnyruilt.alwaysdata.net/").post(requestBody);
+            final Response response = RxOkHttpUtils.request(OK_HTTP_CLIENT, request.build()).blockingGet();
+            if (response.code() == 200) {
+                final String jsonString = Network.getResponseData(response);
+                if (jsonString.contains("hasCorrected\": true")) {
+                    setStatus(status, R.drawable.marker_found, "Barny Available");
+                    return;
                 }
-                setStatus(status, R.drawable.marker_not_found_offline, "Barny NOT available");
             }
+            setStatus(status, R.drawable.marker_not_found_offline, "Barny NOT available");
         });
     }
 

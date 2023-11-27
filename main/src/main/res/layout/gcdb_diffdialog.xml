@@ -2,7 +2,8 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -21,6 +22,14 @@
             android:textSize="@dimen/textSize_detailsSecondary"
             android:textColor="@color/colorText"
             android:visibility="visible"/>
+
+        <CheckBox
+            android:id="@+id/gcdb_upload_to_gc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Upload coords &amp; note to GC.com"
+            android:checked="true"
+            tools:context=".ZtnfnyGcDb" />
 
         <LinearLayout
             android:layout_width="match_parent"

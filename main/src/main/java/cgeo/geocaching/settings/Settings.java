@@ -2154,6 +2154,12 @@ public class Settings {
     public static void setDbToken(final String v) {
         putStringDirect("gcdbtoken", v);
     }
+    public static void setGcDbUploadToGc(final boolean b) {
+        putStringDirect("gcdbgcupload", Boolean.toString(b));
+    }
+    public static boolean getGcDbUploadToGc() {
+        return Boolean.valueOf(getStringDirect("gcdbgcupload", "true"));
+    }
 
     /**
      * sets the user-defined folder-config for a persistable folder. Can be set to null
