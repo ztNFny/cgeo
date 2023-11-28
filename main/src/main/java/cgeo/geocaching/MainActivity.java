@@ -46,6 +46,7 @@ import cgeo.geocaching.utils.Log;
 import cgeo.geocaching.utils.MessageCenterUtils;
 import cgeo.geocaching.utils.ProcessUtils;
 import cgeo.geocaching.utils.ShareUtils;
+import cgeo.geocaching.utils.ZtnfnyGcDb;
 import cgeo.geocaching.utils.config.LegacyFilterConfig;
 import cgeo.geocaching.utils.functions.Action1;
 import static cgeo.geocaching.Intents.EXTRA_MESSAGE_CENTER_COUNTER;
@@ -58,6 +59,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -69,6 +71,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
@@ -323,6 +326,28 @@ public class MainActivity extends AbstractNavigationBarActivity {
         if (Settings.showUnifiedMap()) {
             addButton(R.drawable.sc_icon_map, lp, () -> new UnifiedMapType().launchMap(this), "Start unified map");
         }
+
+        // Update check button
+        addButton(R.drawable.ic_menu_refresh, lp, () -> {
+            View updBtn = null;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                for (int i = 0; i < binding.quicklaunchitems.getChildCount(); i++) {
+                    if (binding.quicklaunchitems.getChildAt(i).getTooltipText().equals("Check for c:geo update")) {
+                        updBtn = binding.quicklaunchitems.getChildAt(i);
+                        break;
+                    }
+                }
+                updBtn.setEnabled(false);
+            }
+            if (!ZtnfnyGcDb.updateCheck(this)) {
+                ShareUtils.openUrl(this, "https://gc.larskl.de/db/cgeo-nightly.apk");
+            } else {
+                Toast.makeText(this, "No c:geo update available", Toast.LENGTH_SHORT).show();
+            }
+            if (updBtn != null) {
+                updBtn.setEnabled(true);
+            }
+        }, "Check for c:geo update");
     }
 
     private void addButton(@DrawableRes final int iconRes, final LinearLayout.LayoutParams lp, final Runnable action, final String tooltip) {

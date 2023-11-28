@@ -1,5 +1,6 @@
 package cgeo.geocaching.utils;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Build;
@@ -14,6 +15,8 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -22,6 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.difflib.DiffUtils;
 import com.github.difflib.UnifiedDiffUtils;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 
 import java.util.Arrays;
@@ -329,6 +333,12 @@ public class ZtnfnyGcDb {
         });
     }
 
+    public static boolean updateCheck(final Activity activity) {
+        final String latestVersion = StringUtils.trim(Network.getResponseData(Network.getRequest("https://gc.larskl.de/db/cgeo-version.php")));
+        final String currentVersionDate = Version.getVersionName(activity).substring(0, 10);
+        return latestVersion.equalsIgnoreCase(currentVersionDate);
+    }
+
     private static GcDbInfo[] callGcDbApi(final String apiAction) {
         final TextView status = gcDbTransaction.getStatus();
         final Geocache cache = gcDbTransaction.getCache();
@@ -382,7 +392,7 @@ public class ZtnfnyGcDb {
         }
     }
 
-    private static String getDbToken(final TextView status) throws LoginException {
+    private static String getDbToken(@Nullable final TextView status) throws LoginException {
         String dbToken = Settings.getDbToken();
         if ("".equals(dbToken)) {
             RequestBody requestBody = new FormBody.Builder()
@@ -397,7 +407,9 @@ public class ZtnfnyGcDb {
                 dbToken = Network.getResponseData(response);
                 Settings.setDbToken(dbToken);
             } else {
-                setStatus(status, R.drawable.marker_archive, "Invalid or unauthorized login. " + response.code());
+                if (status != null) {
+                    setStatus(status, R.drawable.marker_archive, "Invalid or unauthorized login. " + response.code());
+                }
                 throw new LoginException();
             }
         }
