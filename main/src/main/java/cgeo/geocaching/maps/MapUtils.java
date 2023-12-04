@@ -72,6 +72,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -356,15 +357,18 @@ public class MapUtils {
     }
 
     private static void configureDetailsFragment(final Fragment fragment, final AppCompatActivity activity, final Runnable onUpSwipeAction) {
+        final FrameLayout fl = activity.findViewById(R.id.detailsfragment);
+        Optional.ofNullable(fragment.getView())
+                .map(v -> (TextView) v.findViewById(R.id.offline_hint_text))
+                .ifPresent(hint -> hint.setVisibility(View.GONE));
 
         final FragmentTransaction ft = activity.getSupportFragmentManager().beginTransaction();
         final SwipeToOpenFragment swipeToOpenFragment = new SwipeToOpenFragment();
-        ft.replace(R.id.detailsfragment, swipeToOpenFragment, TAG_SWIPE_FRAGMENT);
-        ft.add(R.id.detailsfragment, fragment, TAG_MAPDETAILS_FRAGMENT);
+        ft.replace(R.id.detailsfragment, fragment, TAG_MAPDETAILS_FRAGMENT);
+        ft.add(R.id.detailsfragment, swipeToOpenFragment, TAG_SWIPE_FRAGMENT);
 
         ft.commit();
 
-        final FrameLayout fl = activity.findViewById(R.id.detailsfragment);
         final ViewGroup.LayoutParams params = fl.getLayoutParams();
         final CoordinatorLayout.Behavior<?> behavior = ((CoordinatorLayout.LayoutParams) params).getBehavior();
         final boolean isBottomSheet = behavior instanceof BottomSheetBehavior;
@@ -373,15 +377,23 @@ public class MapUtils {
             final BottomSheetBehavior<FrameLayout> b = BottomSheetBehavior.from(fl);
             b.setHideable(true);
             b.setSkipCollapsed(false);
-            b.setPeekHeight(0); // temporary set to 0 to avoid bumping. Gets updated once view is loaded.
             b.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
             ft.runOnCommit(() -> {
                 final View view = fragment.requireView();
                 // make bottom sheet fill whole screen
-                swipeToOpenFragment.requireView().setMinimumHeight(Resources.getSystem().getDisplayMetrics().heightPixels);
+                //swipeToOpenFragment.requireView().setMinimumHeight(Resources.getSystem().getDisplayMetrics().heightPixels);
                 // set the height of collapsed state to height of the details fragment
-                view.getViewTreeObserver().addOnGlobalLayoutListener(() -> b.setPeekHeight(view.getHeight()));
+                view.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
+                    final TextView hint = view.findViewById(R.id.offline_hint_text);
+                    if (hint != null) {
+                        if (hint.getVisibility() == View.GONE) {
+                            b.setPeekHeight(view.getHeight());
+                            hint.setVisibility(View.VISIBLE);
+                        }
+                    }
+                });
+
             });
 
             final BottomSheetBehavior.BottomSheetCallback callback = new BottomSheetBehavior.BottomSheetCallback() {
@@ -398,7 +410,7 @@ public class MapUtils {
 
                 @Override
                 public void onSlide(@NonNull final View bottomSheet, final float slideOffset) {
-                    swipeToOpenFragment.setExpansion(slideOffset, fragment.getView());
+                    //swipeToOpenFragment.setExpansion(slideOffset, fragment.getView());
                 }
             };
 
