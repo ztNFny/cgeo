@@ -69,6 +69,7 @@ android {
     }
 
     buildTypes {
+
         debug {
             // debug build name contains git commit for better reproduction of bugs
             versionNameSuffix "-" + GitCommit.currentShort() + " developer build"
@@ -92,6 +93,7 @@ android {
         }
         nightly {
             String nightlyName = System.getenv('NB') // NB, NB1, ...
+            println("NightlyName:" + nightlyName)
             versionNameSuffix "-$nightlyName-" + GitCommit.currentShort()
             signingConfig signingConfigs.release
             // use release version of source code library dependencies
@@ -585,6 +587,7 @@ static int versionCodeFromDate(offset) {
 static String versionNameFromDate() {
     Date date = new Date()
     String formattedDate = date.format('yyyy.MM.dd')
+    println("Build date:" + formattedDate)
     return formattedDate
 }
 
@@ -593,13 +596,13 @@ class GitCommit {
     static String commitId
 
     static String current() {
-        if (commitId == null) {
-            Process p = ['git', 'rev-parse', 'HEAD'].execute()
-            if (p.waitFor() != 0) {
-                throw new Error("Unable to get git commit id: " + p.err.text)
-            }
-            commitId = p.text.trim()
+        println("commitId:recalc")
+        Process p = ['git', 'rev-parse', 'HEAD'].execute()
+        if (p.waitFor() != 0) {
+            throw new Error("Unable to get git commit id: " + p.err.text)
         }
+        commitId = p.text.trim()
+        println("commitId:" + commitId)
         return commitId
     }
 
