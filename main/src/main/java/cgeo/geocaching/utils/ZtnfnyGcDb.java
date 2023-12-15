@@ -28,6 +28,7 @@ import com.github.difflib.UnifiedDiffUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -175,10 +176,14 @@ public class ZtnfnyGcDb {
 
             // Delete old DB waypoints
             List<Waypoint> waypointList = cache.getWaypoints();
+            List<Waypoint> waypointsToDelete = new ArrayList<>();
             for (Waypoint waypoint : waypointList) {
                 if (waypoint.getName().startsWith("DB v")) {
-                    cache.deleteWaypoint(waypoint);
+                    waypointsToDelete.add(waypoint);
                 }
+            }
+            for (Waypoint waypoint : waypointsToDelete) {
+                cache.deleteWaypoint(waypoint);
             }
 
             for (GcDbInfo dbInfo : dbInfos) {
@@ -197,11 +202,15 @@ public class ZtnfnyGcDb {
 
             // Delete old DB waypoints
             List<Waypoint> waypointList = cache.getWaypoints();
+            List<Waypoint> waypointsToDelete = new ArrayList<>();
             for (Waypoint waypoint : waypointList) {
                 if (waypoint.getName().startsWith("DB v")) {
-                    cache.deleteWaypoint(waypoint);
-                    delCount++;
+                    waypointsToDelete.add(waypoint);
                 }
+            }
+            for (Waypoint waypoint : waypointsToDelete) {
+                delCount++;
+                cache.deleteWaypoint(waypoint);
             }
 
             saveAndRefresh(cache);
