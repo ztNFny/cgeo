@@ -1295,10 +1295,11 @@ public class CacheDetailActivity extends TabbedViewPagerActivity
             binding.removeFromFavpoint.setOnClickListener(new FavoriteRemoveClickListener());
             updateFavPointBox(activity);
 
-            binding.checkBarny.setVisibility(Settings.getBarny() ? View.VISIBLE : View.GONE);
-            binding.checkBarny.setOnClickListener(new ZtnfnyGcDbClickListener());
-            binding.gcdbHistory.setOnClickListener(new ZtnfnyGcDbClickListener());
-            binding.gcdbSync.setOnClickListener(new ZtnfnyGcDbClickListener());
+            if (Settings.getBarny()) {
+                ZtnfnyGcDb.checkBarnyAvailability(binding.checkBarny, cache);
+            }
+            ZtnfnyGcDb.getDbHistory(binding.gcdbHistory, cache);
+            ZtnfnyGcDb.syncDb(binding.gcdbSync, cache, false);
 
             // data license
             final IConnector connector = ConnectorFactory.getConnector(cache);
@@ -1410,7 +1411,7 @@ public class CacheDetailActivity extends TabbedViewPagerActivity
         /**
          * Abstract Listener for add / remove buttons for watchlist
          */
-        private abstract class AbstractPropertyListener implements View.OnClickListener, View.OnLongClickListener {
+        private abstract class AbstractPropertyListener implements View.OnClickListener {
             private final ProgressButtonDisposableHandler handler;
             protected MaterialButton button;
 
@@ -1430,11 +1431,6 @@ public class CacheDetailActivity extends TabbedViewPagerActivity
                 }
                 AndroidRxUtils.networkScheduler.scheduleDirect(() -> action.call(handler));
             }
-
-            @Override
-            public boolean onLongClick(final View v) {
-                return true;
-            }
         }
 
         /**
@@ -1446,28 +1442,6 @@ public class CacheDetailActivity extends TabbedViewPagerActivity
             public void onClick(final View arg0) {
                 button = (MaterialButton) arg0;
                 doExecute(handler -> DetailsViewCreator.this.watchListAdd(handler));
-            }
-        }
-        private class ZtnfnyGcDbClickListener extends AbstractPropertyListener {
-            @Override
-            public void onClick(final View arg0) {
-                button = (MaterialButton) arg0;
-                if (button.getId() == R.id.gcdb_sync) {
-                    doExecute(handler -> ZtnfnyGcDb.syncDb(handler, button, cache));
-                } else if (button.getId() == R.id.gcdb_history) {
-                    doExecute(handler -> ZtnfnyGcDb.getDbHistory(handler, button, cache));
-                } else if (button.getId() == R.id.checkBarny) {
-                    doExecute(handler -> ZtnfnyGcDb.checkBarnyAvailability(handler, button, cache));
-                }
-            }
-
-            @Override
-            public boolean onLongClick(final View arg0) {
-                button = (MaterialButton) arg0;
-                if (button.getId() == R.id.gcdb_history) {
-                    doExecute(handler -> ZtnfnyGcDb.deleteHistoryWPs(handler, button, cache));
-                }
-                return true;
             }
         }
 

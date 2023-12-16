@@ -3264,10 +3264,6 @@
     <string name="rtl_path_quality45">quality 4/5 (unpaved)</string>
 
     <string name="gcdb_diff_title">GCT Compare</string>
-    <string name="gcdb_diff_match">Coordinates &amp; Note already match</string>
-    <string name="gcdb_notfound">No results</string>
-    <string name="gcdb_syncok">OK</string>
-    <string name="gcdb_syncerror">Error</string>
 
     <!-- Smileys GC / OC -->
     <string name="smiley_smile">Smiley</string>
