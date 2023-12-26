@@ -6,6 +6,7 @@
     android:background="@drawable/rounded_corners_top"
     android:backgroundTint="@color/colorBackgroundDialog"
     android:gravity="center"
+    android:alpha="0"
     android:orientation="vertical">
 
     <ImageView

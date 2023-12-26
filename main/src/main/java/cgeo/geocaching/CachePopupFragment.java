@@ -38,6 +38,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.text.HtmlCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
@@ -175,6 +176,13 @@ public class CachePopupFragment extends AbstractDialogFragmentWithProximityNotif
 
             // offline use
             CacheDetailActivity.updateOfflineBox(binding.getRoot(), cache, res, new RefreshCacheClickListener(), new DropCacheClickListener(), new StoreCacheClickListener(), new ShowHintClickListener(binding), new MoveCacheClickListener(), new StoreCacheClickListener());
+
+            binding.offlineHintArea.setVisibility(View.GONE);
+            binding.offlineHint.setVisibility(View.GONE);
+            binding.offlineHintText.setVisibility(View.VISIBLE);
+            binding.offlineHintText.setText(HtmlCompat.fromHtml(cache.getHint(), HtmlCompat.FROM_HTML_MODE_LEGACY), TextView.BufferType.SPANNABLE);
+            binding.hintNoteSep.setVisibility((cache.getHint().isEmpty() || cache.getPersonalNote() == null || cache.getPersonalNote().isEmpty()) ? View.GONE : View.VISIBLE);
+            binding.personalnote.setText(cache.getPersonalNote(), TextView.BufferType.SPANNABLE);
 
             CacheDetailActivity.updateCacheLists(binding.getRoot(), cache, res);
 

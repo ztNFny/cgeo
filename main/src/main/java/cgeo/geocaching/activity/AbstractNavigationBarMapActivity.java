@@ -27,6 +27,8 @@ import com.google.android.material.sidesheet.SideSheetBehavior;
 import com.google.android.material.sidesheet.SideSheetCallback;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Optional;
+
 public abstract class AbstractNavigationBarMapActivity extends AbstractNavigationBarActivity {
 
     private static final String TAG_MAPDETAILS_FRAGMENT = "mapdetails_fragment";
@@ -61,17 +63,20 @@ public abstract class AbstractNavigationBarMapActivity extends AbstractNavigatio
 
     private void sheetConfigureFragment(final Fragment fragment, final Runnable onUpSwipeAction) {
         final FrameLayout fl = findViewById(R.id.detailsfragment);
+        Optional.ofNullable(fragment.getView())
+                .map(v -> (View) v.findViewById(R.id.offline_hint_area))
+                .ifPresent(hint -> hint.setVisibility(View.GONE));
+
         final ViewGroup.LayoutParams params = fl.getLayoutParams();
         final CoordinatorLayout.Behavior<?> behavior = ((CoordinatorLayout.LayoutParams) params).getBehavior();
         final boolean isBottomSheet = behavior instanceof BottomSheetBehavior;
 
         final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.setCustomAnimations(R.anim.slide_in, R.anim.slide_out);
         final SwipeToOpenFragment swipeToOpenFragment = isBottomSheet ? new SwipeToOpenFragment() : null;
+        ft.replace(R.id.detailsfragment, fragment, TAG_MAPDETAILS_FRAGMENT);
         if (isBottomSheet) {
-            ft.replace(R.id.detailsfragment, swipeToOpenFragment, TAG_SWIPE_FRAGMENT);
-            ft.add(R.id.detailsfragment, fragment, TAG_MAPDETAILS_FRAGMENT);
-        } else {
-            ft.replace(R.id.detailsfragment, fragment, TAG_MAPDETAILS_FRAGMENT);
+            ft.add(R.id.detailsfragment, swipeToOpenFragment, TAG_SWIPE_FRAGMENT);
         }
         ft.commit();
 
@@ -79,19 +84,27 @@ public abstract class AbstractNavigationBarMapActivity extends AbstractNavigatio
             final BottomSheetBehavior<FrameLayout> b = BottomSheetBehavior.from(fl);
             b.setHideable(true);
             b.setSkipCollapsed(false);
-            b.setPeekHeight(0); // temporary set to 0 to avoid bumping. Gets updated once view is loaded.
+            //b.setPeekHeight(0); // temporary set to 0 to avoid bumping. Gets updated once view is loaded.
             b.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
             ft.runOnCommit(() -> {
                 final View view = fragment.requireView();
                 // make bottom sheet fill whole screen
-                swipeToOpenFragment.requireView().setMinimumHeight(Resources.getSystem().getDisplayMetrics().heightPixels);
+                //swipeToOpenFragment.requireView().setMinimumHeight(Resources.getSystem().getDisplayMetrics().heightPixels);
                 // set the height of collapsed state to height of the details fragment
                 synchronized (layoutListeners) {
                     if (layoutListeners[0] != null) {
                         view.getViewTreeObserver().removeOnGlobalLayoutListener(layoutListeners[0]);
                     }
-                    layoutListeners[0] = () -> b.setPeekHeight(view.getHeight());
+                    layoutListeners[0] = () -> {
+                        final View hint = view.findViewById(R.id.offline_hint_area);
+                        if (hint != null) {
+                            if (hint.getVisibility() == View.GONE) {
+                                b.setPeekHeight(view.getHeight());
+                                hint.setVisibility(View.VISIBLE);
+                            }
+                        }
+                    };
                     view.getViewTreeObserver().addOnGlobalLayoutListener(layoutListeners[0]);
                 }
             });
@@ -112,7 +125,7 @@ public abstract class AbstractNavigationBarMapActivity extends AbstractNavigatio
 
                 @Override
                 public void onSlide(@NonNull final View bottomSheet, final float slideOffset) {
-                    swipeToOpenFragment.setExpansion(slideOffset, fragment.getView());
+                    //swipeToOpenFragment.setExpansion(slideOffset, fragment.getView());
                 }
             };
 

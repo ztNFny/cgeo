@@ -72,6 +72,15 @@
                 style="@style/button_full_popups"
                 android:text="@string/cache" />
 
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:minHeight="140dp"
+                android:id="@+id/offline_hint_area"
+                android:orientation="vertical">
+
+            </LinearLayout>
+
         </LinearLayout>
     </ScrollView>
 
