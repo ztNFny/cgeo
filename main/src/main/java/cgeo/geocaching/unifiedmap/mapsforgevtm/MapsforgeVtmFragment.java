@@ -40,6 +40,7 @@ import androidx.core.text.HtmlCompat;
 import androidx.core.util.Pair;
 
 import java.util.ArrayList;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.oscim.android.MapView;
@@ -138,7 +139,7 @@ public class MapsforgeVtmFragment extends AbstractMapFragment {
         renderer.setOffset(30 * CanvasAdapter.getScale(), 0); // make room for attribution
         addLayer(LayerHelper.ZINDEX_SCALEBAR, mapScaleBarLayer);
 
-        if (Settings.getBoolean(R.string.pref_maphillshading, false)) {
+        if (Settings.getMapShadingEnabled()) {
             addLayer(2, new MapilionHillshadingSource().getBitmapTileLayer(mMap));
         }
 
