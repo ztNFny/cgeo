@@ -14,6 +14,7 @@ import cgeo.geocaching.unifiedmap.geoitemlayer.MapsforgeVtmGeoItemLayer;
 import cgeo.geocaching.unifiedmap.mapsforgevtm.legend.RenderThemeLegend;
 import cgeo.geocaching.unifiedmap.tileproviders.AbstractMapsforgeTileProvider;
 import cgeo.geocaching.unifiedmap.tileproviders.AbstractTileProvider;
+import cgeo.geocaching.unifiedmap.tileproviders.MapilionHillshadingSource;
 import cgeo.geocaching.utils.AngleUtils;
 import cgeo.geocaching.utils.GroupedList;
 import cgeo.geocaching.utils.ImageUtils;
@@ -136,6 +137,10 @@ public class MapsforgeVtmFragment extends AbstractMapFragment {
         renderer.setPosition(GLViewport.Position.BOTTOM_LEFT);
         renderer.setOffset(30 * CanvasAdapter.getScale(), 0); // make room for attribution
         addLayer(LayerHelper.ZINDEX_SCALEBAR, mapScaleBarLayer);
+
+        if (Settings.getBoolean(R.string.pref_maphillshading, false)) {
+            addLayer(2, new MapilionHillshadingSource().getBitmapTileLayer(mMap));
+        }
 
         if (this.mapAttribution != null) {
             this.mapAttribution.setOnClickListener(v -> displayMapAttribution());
