@@ -9,7 +9,7 @@ import android.net.Uri;
 import androidx.core.util.Pair;
 
 import java.io.File;
-import java.util.HashMap;
+import java.util.Collections;
 
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
@@ -21,12 +21,10 @@ import org.oscim.tiling.source.bitmap.BitmapTileSource;
 class AbstractMapsforgeOnlineTileProvider extends AbstractMapsforgeTileProvider {
 
     private final String tilePath;
-    private final HashMap<String, String> header = new HashMap<>();
 
     AbstractMapsforgeOnlineTileProvider(final String name, final Uri uri, final String tilePath, final int zoomMin, final int zoomMax, final Pair<String, Boolean> mapAttribution) {
         super(name, uri, zoomMin, zoomMax, mapAttribution);
         this.tilePath = tilePath;
-        this.header.put("User-Agent", "cgeo-android");
     }
 
     @Override
@@ -45,12 +43,7 @@ class AbstractMapsforgeOnlineTileProvider extends AbstractMapsforgeTileProvider 
                 .zoomMin(zoomMin)
                 .build();
         tileSource.setHttpEngine(new OkHttpEngine.OkHttpFactory(httpBuilder));
-        tileSource.setHttpRequestHeaders(header);
+        tileSource.setHttpRequestHeaders(Collections.singletonMap("User-Agent", "cgeo-android"));
         return new BitmapTileLayer(map, tileSource);
     }
-
-    public void addHeader(final String name, final String value) {
-        this.header.put(name, value);
-    }
-
 }
