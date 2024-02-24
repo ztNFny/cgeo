@@ -322,11 +322,6 @@ public class MainActivity extends AbstractNavigationBarActivity {
             }
         }
 
-        // temporarily add button for unified map, if enabled in settings
-        if (Settings.showUnifiedMap()) {
-            addButton(R.drawable.sc_icon_map, lp, () -> new UnifiedMapType().launchMap(this), "Start unified map");
-        }
-
         // Update check button
         addButton(R.drawable.ic_menu_refresh, lp, () -> {
             View updBtn = null;
