@@ -1,8 +1,11 @@
 package cgeo.geocaching.utils;
 
+import static cgeo.geocaching.utils.ProgressButtonDisposableHandler.getCircularProgressIndicatorDrawable;
+
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
@@ -24,6 +27,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.difflib.DiffUtils;
 import com.github.difflib.UnifiedDiffUtils;
+import com.google.android.material.button.MaterialButton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -34,6 +38,8 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.security.auth.login.LoginException;
 
@@ -445,6 +451,49 @@ public class ZtnfnyGcDb {
         });
     }
 
+    public static void checkGCJigidi(final Button btn, final Geocache cache) {
+        btn.setVisibility(View.VISIBLE);
+        final TextView status = (TextView) ((ViewGroup)btn.getParent()).getChildAt(0);
+        btn.setOnClickListener(v -> {
+            Drawable originalIcon = disableButton(v);
+            final Request.Builder request = new Request.Builder().url("https://solvedjigidi.com/search.php?gc="+cache.getGeocode()).get();
+            final Response response = RxOkHttpUtils.request(OK_HTTP_CLIENT, request.build()).blockingGet();
+            enableButton(v, originalIcon);
+            if (response.code() == 200) {
+                final String html = Network.getResponseData(response);
+                if (html.contains("was not found in the database")) {
+                    setStatus(status, R.drawable.marker_not_found_offline, "SolveJigidi not available");
+                } else if (html.contains("<h2>Found")) {
+                    setStatus(status, R.drawable.marker_found, "SolveJigidi Available");
+                    Matcher coordsMatch = Pattern.compile("<strong>Coords:</strong>\\s*([^<]*)\\s*</p>").matcher(html);
+                    Matcher notesMatch = Pattern.compile("<strong>Notes:</strong>\\s*([^<]*)\\s*</p>").matcher(html);
+
+                    gcDbTransaction = new GcDbTransaction(cache, status, btn.getContext());
+                    gcDbTransaction.setDbInfo(new GcDbInfo(coordsMatch.find() ? coordsMatch.group(1) : "", notesMatch.find() ? notesMatch.group(1) : ""));
+                    showDiffDialog();
+                } else {
+                    setStatus(status, R.drawable.marker_not_found_offline, "SolveJigidi unexpected response");
+                    Log.d("SolveJigidi:" + html);
+                }
+            }
+            setStatus(status, R.drawable.marker_not_found_offline, "SolveJigidi unexpected response: " + response.code());
+        });
+    }
+
+    private static Drawable disableButton(final View v) {
+        MaterialButton button = (MaterialButton) v;
+        Drawable originalIcon = button.getIcon();
+        button.setEnabled(false);
+        button.setIcon(getCircularProgressIndicatorDrawable(button.getContext()));
+        return originalIcon;
+    }
+
+    private static void enableButton(final View v, final Drawable originalIcon) {
+        MaterialButton button = (MaterialButton) v;
+        button.setEnabled(true);
+        button.setIcon(originalIcon);
+    }
+
     private static void saveAndRefresh(final Geocache cache) {
         // Save
         DataStore.saveCache(cache, EnumSet.of(LoadFlags.SaveFlag.DB));
@@ -545,6 +594,16 @@ public class ZtnfnyGcDb {
             this.username = Settings.getGcCredentials().getUserName();
             this.gcname = cache.getName();
             this.gctype = cache.getType().wptTypeId;
+        }
+
+        public GcDbInfo(final String coords, final String note) {
+            Geopoint geopoint = new Geopoint(coords);
+            this.latitude = (float) geopoint.getLatitude();
+            this.longitude = (float) geopoint.getLongitude();
+            this.usernote = note;
+            this.username = "GC Jigidi";
+            this.gcname = "";
+            this.gctype = "-";
         }
 
         @JsonIgnore

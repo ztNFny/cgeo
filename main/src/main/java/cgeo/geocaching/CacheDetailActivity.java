@@ -1298,6 +1298,7 @@ public class CacheDetailActivity extends TabbedViewPagerActivity
             if (Settings.getBarny()) {
                 ZtnfnyGcDb.checkBarnyAvailability(binding.checkBarny, cache);
             }
+            ZtnfnyGcDb.checkGCJigidi(binding.checkJigidi, cache);
             ZtnfnyGcDb.getDbHistory(binding.gcdbHistory, cache);
             ZtnfnyGcDb.syncDb(binding.gcdbSync, cache, false);
 

@@ -332,22 +332,33 @@
                     android:textSize="@dimen/textSize_detailsPrimary" />
 
                 <Button
+                    android:id="@+id/checkJigidi"
+                    style="@style/button_icon"
+                    android:visibility="gone"
+                    android:layout_toLeftOf="@id/checkBarny"
+                    android:tooltipText="Get from SolveJigidi.com"
+                    app:icon="@drawable/attribute_puzzle" />
+
+                <Button
                     android:id="@+id/checkBarny"
                     style="@style/button_icon"
                     android:visibility="gone"
                     android:layout_toLeftOf="@id/gcdb_history"
+                    android:tooltipText="Check barny"
                     app:icon="@drawable/gcdb_barny" />
 
                 <Button
                     android:id="@+id/gcdb_history"
                     style="@style/button_icon"
                     android:layout_toLeftOf="@id/gcdb_sync"
+                    android:tooltipText="Get History from DB"
                     app:icon="@drawable/ic_menu_recent_history" />
 
                 <Button
                     android:id="@+id/gcdb_sync"
                     style="@style/button_icon"
                     android:layout_alignParentRight="true"
+                    android:tooltipText="Sync with DB"
                     app:icon="@drawable/gcdb_cloudsync" />
             </RelativeLayout>
         </LinearLayout>
