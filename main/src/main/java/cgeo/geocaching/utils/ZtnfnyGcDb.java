@@ -5,8 +5,8 @@ import static cgeo.geocaching.utils.ProgressButtonDisposableHandler.getCircularP
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.style.BackgroundColorSpan;
@@ -139,8 +139,8 @@ public class ZtnfnyGcDb {
         final TextView status = (TextView) ((ViewGroup)btn.getParent()).getChildAt(0);
         gcDbTransaction = new GcDbTransaction(cache, status, btn.getContext());
         btn.setOnClickListener(v -> {
+            Drawable originalIcon = disableButton(btn);
             final TextView status1 = gcDbTransaction.getStatus();
-
             // get DB
             final GcDbInfo dbInfo;
             final GcDbInfo[] dbInfos = callGcDbApi("download");
@@ -168,6 +168,7 @@ public class ZtnfnyGcDb {
             } else {
                 Toast.makeText(v.getContext(), "No results", Toast.LENGTH_LONG);
             }
+            enableButton(btn, originalIcon);
         });
     }
 
@@ -175,10 +176,13 @@ public class ZtnfnyGcDb {
         final TextView status = (TextView) ((ViewGroup)btn.getParent()).getChildAt(0);
         gcDbTransaction = new GcDbTransaction(cache, status, btn.getContext());
         btn.setOnClickListener(v -> {
+            Drawable originalIcon = disableButton(btn);
             // get DB
             final GcDbInfo[] dbInfos = callGcDbApi("history");
-
-            if (dbInfos == null || dbInfos.length == 0) return;
+            if (dbInfos == null || dbInfos.length == 0) {
+                enableButton(btn, originalIcon);
+                return;
+            }
 
             // Delete old DB waypoints
             List<Waypoint> waypointList = cache.getWaypoints();
@@ -201,6 +205,7 @@ public class ZtnfnyGcDb {
 
             saveAndRefresh(cache);
 
+            enableButton(btn, originalIcon);
             setStatus(status, R.drawable.marker_visited, dbInfos.length + " history waypoints added. Hold this button to delete them again.");
         });
         btn.setOnLongClickListener(v -> {
@@ -290,12 +295,13 @@ public class ZtnfnyGcDb {
 
         final View v = LayoutInflater.from(gcDbTransaction.getCtx()).inflate(R.layout.gcdb_diffdialog, null);
         ((TextView) v.findViewById(R.id.gcdb_diff)).setText(ssb, TextView.BufferType.SPANNABLE);
-        Dialog dialog = Dialogs.bottomSheetDialogWithActionbar(gcDbTransaction.getCtx(), v, R.string.gcdb_diff_title);
+        Dialog dialog = Dialogs.bottomSheetDialogWithActionbar(gcDbTransaction.getCtx(), v, gcDbTransaction.isDownloadOnly() ? R.string.gcdb_diff_title_sj : R.string.gcdb_diff_title);
         dialog.show();
         final Button downloadButton = v.findViewById(R.id.gcdb_download_remote);
         final CheckBox uploadToGcChkBox = v.findViewById(R.id.gcdb_upload_to_gc);
         uploadToGcChkBox.setChecked(Settings.getGcDbUploadToGc());
         final Button uploadButton = v.findViewById(R.id.gcdb_upload_local);
+        uploadButton.setVisibility(gcDbTransaction.isDownloadOnly() ? View.GONE : View.VISIBLE);
         downloadButton.setOnClickListener(b -> {
             doDownload(uploadToGcChkBox.isChecked());
             dialog.dismiss();
@@ -435,19 +441,25 @@ public class ZtnfnyGcDb {
         btn.setVisibility(View.VISIBLE);
         final TextView status = (TextView) ((ViewGroup)btn.getParent()).getChildAt(0);
         btn.setOnClickListener(v -> {
-            RequestBody requestBody = new FormBody.Builder()
-                .add("gccode", cache.getGeocode())
-                .build();
-            final Request.Builder request = new Request.Builder().url("https://barnyruilt.alwaysdata.net/").post(requestBody);
-            final Response response = RxOkHttpUtils.request(OK_HTTP_CLIENT, request.build()).blockingGet();
-            if (response.code() == 200) {
-                final String jsonString = Network.getResponseData(response);
-                if (jsonString.contains("hasCorrected\": true")) {
-                    setStatus(status, R.drawable.marker_found, "Barny Available");
-                    return;
+            Drawable originalIcon = disableButton(btn);
+            AndroidRxUtils.andThenOnUi(AndroidRxUtils.networkScheduler, () -> {
+                RequestBody requestBody = new FormBody.Builder()
+                        .add("gccode", cache.getGeocode())
+                        .build();
+                final Request.Builder request = new Request.Builder().url("https://barnyruilt.alwaysdata.net/").post(requestBody);
+                final Response response = RxOkHttpUtils.request(OK_HTTP_CLIENT, request.build()).blockingGet();
+                return response;
+            }, response -> {
+                enableButton(btn, originalIcon);
+                if (response.code() == 200) {
+                    final String jsonString = Network.getResponseData(response);
+                    if (jsonString.contains("hasCorrected\": true")) {
+                        setStatus(status, R.drawable.marker_found, "Barny Available");
+                        return;
+                    }
                 }
-            }
-            setStatus(status, R.drawable.marker_not_found_offline, "Barny NOT available");
+                setStatus(status, R.drawable.marker_not_found_offline, "Barny NOT available");
+            });
         });
     }
 
@@ -455,28 +467,36 @@ public class ZtnfnyGcDb {
         btn.setVisibility(View.VISIBLE);
         final TextView status = (TextView) ((ViewGroup)btn.getParent()).getChildAt(0);
         btn.setOnClickListener(v -> {
-            Drawable originalIcon = disableButton(v);
-            final Request.Builder request = new Request.Builder().url("https://solvedjigidi.com/search.php?gc="+cache.getGeocode()).get();
-            final Response response = RxOkHttpUtils.request(OK_HTTP_CLIENT, request.build()).blockingGet();
-            enableButton(v, originalIcon);
-            if (response.code() == 200) {
-                final String html = Network.getResponseData(response);
-                if (html.contains("was not found in the database")) {
-                    setStatus(status, R.drawable.marker_not_found_offline, "SolveJigidi not available");
-                } else if (html.contains("<h2>Found")) {
-                    setStatus(status, R.drawable.marker_found, "SolveJigidi Available");
-                    Matcher coordsMatch = Pattern.compile("<strong>Coords:</strong>\\s*([^<]*)\\s*</p>").matcher(html);
-                    Matcher notesMatch = Pattern.compile("<strong>Notes:</strong>\\s*([^<]*)\\s*</p>").matcher(html);
+            Drawable originalIcon = disableButton(btn);
+            AndroidRxUtils.andThenOnUi(AndroidRxUtils.networkScheduler, () -> {
+                final Request.Builder request = new Request.Builder().url("https://solvedjigidi.com/search.php?gc="+cache.getGeocode()).get();
+                final Response response = RxOkHttpUtils.request(OK_HTTP_CLIENT, request.build()).blockingGet();
+                return response;
+            }, response -> {
+                enableButton(btn, originalIcon);
+                if (response.code() == 200) {
+                    final String html = Network.getResponseData(response);
+                    if (html.contains("was not found in the database")) {
+                        setStatus(status, R.drawable.marker_not_found_offline, "SolveJigidi not available");
+                        return;
+                    } else if (html.contains("<h2>Found")) {
+                        setStatus(status, R.drawable.marker_found, "SolveJigidi Available");
+                        Matcher coordsMatch = Pattern.compile("<strong>Coords:</strong>\\s*([^<]*)\\s*</p>").matcher(html);
+                        Matcher notesMatch = Pattern.compile("<strong>Notes:</strong>\\s*([^<]*)\\s*</p>").matcher(html);
 
-                    gcDbTransaction = new GcDbTransaction(cache, status, btn.getContext());
-                    gcDbTransaction.setDbInfo(new GcDbInfo(coordsMatch.find() ? coordsMatch.group(1) : "", notesMatch.find() ? notesMatch.group(1) : ""));
-                    showDiffDialog();
-                } else {
-                    setStatus(status, R.drawable.marker_not_found_offline, "SolveJigidi unexpected response");
-                    Log.d("SolveJigidi:" + html);
+                        gcDbTransaction = new GcDbTransaction(cache, status, btn.getContext());
+                        gcDbTransaction.setDownloadOnly(true);
+                        gcDbTransaction.setDbInfo(new GcDbInfo(coordsMatch.find() ? coordsMatch.group(1) : "", notesMatch.find() ? notesMatch.group(1) : ""));
+                        showDiffDialog();
+                        return;
+                    } else {
+                        setStatus(status, R.drawable.marker_not_found_offline, "SolveJigidi unexpected response");
+                        Log.d("SolveJigidi:" + html);
+                        return;
+                    }
                 }
-            }
-            setStatus(status, R.drawable.marker_not_found_offline, "SolveJigidi unexpected response: " + response.code());
+                setStatus(status, R.drawable.marker_not_found_offline, "SolveJigidi unexpected response: " + response.code());
+            });
         });
     }
 
@@ -507,6 +527,7 @@ public class ZtnfnyGcDb {
         private final Geocache cache;
         private GcDbInfo dbInfo;
         private final TextView status;
+        private boolean downloadOnly = false;
 
         public GcDbTransaction(Geocache cache, TextView status, Context context) {
             this.cache = cache;
@@ -548,6 +569,14 @@ public class ZtnfnyGcDb {
 
         private boolean coordsMatch() {
             return cache.getCoords().format(GeopointFormatter.Format.LAT_LON_DECMINUTE_RAW).equals(dbInfo.getGeopoint().format(GeopointFormatter.Format.LAT_LON_DECMINUTE_RAW));
+        }
+
+        public boolean isDownloadOnly() {
+            return downloadOnly;
+        }
+
+        public void setDownloadOnly(boolean downloadOnly) {
+            this.downloadOnly = downloadOnly;
         }
     }
 
