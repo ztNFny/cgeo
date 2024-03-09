@@ -719,6 +719,10 @@ public class Settings {
         return enableFeatureWherigo() && getBoolean(R.string.pref_feature_wherigo_debug, false);
     }
 
+    public static boolean isFeatureEnabled(@StringRes final int featureKeyId) {
+        return getBoolean(featureKeyId, true);
+    }
+
     public static String getALCLauncher() {
         return getString(R.string.pref_alc_launcher, "");
     }
