@@ -2,6 +2,12 @@ package cgeo.geocaching.ui.dialog;
 
 import cgeo.geocaching.R;
 import cgeo.geocaching.activity.Keyboard;
+import cgeo.geocaching.models.Image;
+import cgeo.geocaching.network.HttpRequest;
+import cgeo.geocaching.network.HttpResponse;
+import cgeo.geocaching.utils.ImageUtils;
+import static cgeo.geocaching.connector.gc.GCAuthAPI.websiteReq;
+import static cgeo.geocaching.utils.ProgressButtonDisposableHandler.getCircularProgressIndicatorDrawable;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -12,10 +18,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.PickVisualMediaRequest;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
 
+import java.io.File;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.android.material.button.MaterialButton;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -59,7 +74,42 @@ public class EditNoteDialog extends AbstractFullscreenDialog {
 
         toolbar = view.findViewById(R.id.toolbar);
 
+        ActivityResultLauncher<PickVisualMediaRequest> pickMedia =
+                registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {
+                    if (uri != null) {
+                        Image image = new Image.Builder().setUrl(uri).build();
+                        final File imageFileForUpload = ImageUtils.scaleAndCompressImageToTemporaryFile(image.getUri(), 800, 75);
+                        try (GCWebListingImageResponse imgResponse = websiteReq().uri("/api/proxy/web/v1/images/textFieldImages/GeocacheDescription")
+                                .method(HttpRequest.Method.POST)
+                                .bodyForm(null, "image", "image/jpeg", imageFileForUpload)
+                                .requestJson(GCWebListingImageResponse.class).blockingGet()) {
+                            if (imgResponse.url == null) {
+                                Toast.makeText(this.getContext(), "Problem posting image, response is: " + imgResponse, Toast.LENGTH_LONG);
+                            }
+                            EditText note = view.findViewById(R.id.note);
+                            note.append("\n"+imgResponse.url.replace(":443", ""));
+                        }
+                    }
+                    MaterialButton v = view.findViewById(R.id.image_add_multi);
+                    v.setEnabled(true);
+                    v.setIcon(getContext().getDrawable(R.drawable.ic_menu_image_multi));
+                });
+        view.findViewById(R.id.image_add_multi).setOnClickListener(v -> {
+            v.setEnabled(false);
+            ((MaterialButton) v).setIcon(getCircularProgressIndicatorDrawable(v.getContext()));
+            pickMedia.launch(new PickVisualMediaRequest.Builder()
+                    .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
+                    .build());
+        });
+
         return view;
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static final class GCWebListingImageResponse extends HttpResponse {
+        @JsonProperty("url")
+        String url;
+
     }
 
     @Override
