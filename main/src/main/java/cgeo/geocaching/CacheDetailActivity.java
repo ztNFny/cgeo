@@ -106,7 +106,6 @@ import cgeo.geocaching.utils.ProgressButtonDisposableHandler;
 import cgeo.geocaching.utils.ShareUtils;
 import cgeo.geocaching.utils.SimpleDisposableHandler;
 import cgeo.geocaching.utils.TextUtils;
-import cgeo.geocaching.utils.UnknownTagsHandler;
 import cgeo.geocaching.utils.ZtnfnyGcDb;
 import cgeo.geocaching.utils.functions.Action1;
 import cgeo.geocaching.utils.html.HtmlStyle;

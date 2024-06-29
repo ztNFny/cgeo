@@ -479,7 +479,7 @@ public class ZtnfnyGcDb {
                     if (html.contains("was not found in the database")) {
                         setStatus(status, R.drawable.marker_not_found_offline, "SolveJigidi not available");
                         return;
-                    } else if (html.contains("<h2>Found")) {
+                    } else if (html.contains("coord.info/"+cache.getGeocode())) {
                         setStatus(status, R.drawable.marker_found, "SolveJigidi Available");
                         Matcher coordsMatch = Pattern.compile("<strong>Coords:</strong>\\s*([^<]*)\\s*</p>").matcher(html);
                         Matcher notesMatch = Pattern.compile("<strong>Notes:</strong>\\s*([^<]*)\\s*</p>").matcher(html);
