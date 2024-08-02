@@ -116,10 +116,10 @@
                 android:textColor="@color/colorText" />
         </LinearLayout>
 
-        <!-- Hint and spoiler-images box -->
+        <!-- tooltipText and spoiler-images box -->
 
         <LinearLayout
-            android:id="@+id/hint_box"
+            android:id="@+id/tooltipText_box"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dip"
@@ -137,7 +137,7 @@
             </RelativeLayout>
 
             <cgeo.geocaching.ui.IndexOutOfBoundsAvoidingTextView
-                android:id="@+id/hint"
+                android:id="@+id/tooltipText"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
@@ -145,10 +145,10 @@
                 android:textIsSelectable="true"
                 android:textSize="@dimen/textSize_detailsPrimary"
                 android:textColor="@color/colorText"
-                tools:text="A hint for finding the cache..." />
+                tools:text="A tooltipText for finding the cache..." />
 
             <TextView
-                android:id="@+id/hint_spoilerlink"
+                android:id="@+id/tooltipText_spoilerlink"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
@@ -213,13 +213,13 @@
                     <Button
                         android:id="@+id/upload_personalnote"
                         style="@style/button_icon"
-                        android:hint="@string/cache_personal_note_upload"
+                        android:tooltipText="@string/cache_personal_note_upload"
                         app:icon="@drawable/ic_menu_upload" />
 
                     <Button
                         android:id="@+id/edit_personalnote"
                         style="@style/button_icon"
-                        android:hint="@string/cache_personal_note_edit"
+                        android:tooltipText="@string/cache_personal_note_edit"
                         app:icon="@drawable/ic_menu_edit" />
                 </LinearLayout>
 
@@ -233,13 +233,13 @@
                     <Button
                         android:id="@+id/storewaypoints_personalnote"
                         style="@style/button_icon"
-                        android:hint="@string/cache_personal_note_storewaypoints"
+                        android:tooltipText="@string/cache_personal_note_storewaypoints"
                         app:icon="@drawable/ic_menu_waypoint_sync" />
 
                     <Button
                         android:id="@+id/deleteewaypoints_personalnote"
                         style="@style/button_icon"
-                        android:hint="@string/cache_personal_note_removewaypoints"
+                        android:tooltipText="@string/cache_personal_note_removewaypoints"
                         app:icon="@drawable/ic_menu_waypoint_delete" />
 
                 </LinearLayout>
