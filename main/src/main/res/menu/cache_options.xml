@@ -94,6 +94,11 @@
         android:visible="false">
     </item>
     <item
+        android:id="@+id/menu_change_coordinates"
+        android:title="Change coordinates"
+        android:visible="true">
+    </item>
+    <item
         android:id="@+id/menu_waypoints"
         android:title="@string/cache_waypoints"
         app:showAsAction="never"

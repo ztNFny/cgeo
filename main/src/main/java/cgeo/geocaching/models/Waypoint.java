@@ -46,6 +46,7 @@ public class Waypoint implements IWaypoint {
     public static final String WP_PROJECTION_CONFIG_KEY = "P";
     private static final int ORDER_UNDEFINED = -2;
 
+    public static final int NONE_ID = -2;
     public static final int NEW_ID = -1;
 
     private int id = NEW_ID;

@@ -716,7 +716,11 @@ public class CacheDetailActivity extends TabbedViewPagerActivity
         }
 
         final int menuItem = item.getItemId();
-        if (menuItem == R.id.menu_delete_userdefined_waypoints) {
+        if (menuItem == R.id.menu_change_coordinates) {
+            ensureSaved();
+            EditWaypointActivity.startActivitySetCoordinates(this, cache);
+            refreshOnResume = true;
+        } else if (menuItem == R.id.menu_delete_userdefined_waypoints) {
             dropUserdefinedWaypoints();
         } else if (menuItem == R.id.menu_delete_generated_waypoints) {
             dropGeneratedWaypoints();

@@ -282,6 +282,17 @@ public class EditWaypointActivity extends AbstractActionBarActivity implements C
             binding.noteLayout.setVisibility(View.GONE);
             updateCoordinates(preprojectedCoords);
         }
+        if (waypointId == Waypoint.NONE_ID) {
+            setTitle("Change coordinates");
+            binding.modifyCacheCoordinatesLocal.setChecked(true);
+            binding.type.setVisibility(View.GONE);
+            binding.nameLayout.setVisibility(View.GONE);
+            binding.noteLayout.setVisibility(View.GONE);
+            binding.userNote.setVisibility(View.GONE);
+            binding.wptVisitedCheckbox.setVisibility(View.GONE);
+            binding.modifyCacheCoordinatesNothing.setVisibility(View.GONE);
+            binding.buttonLatLongitude.performClick();
+        }
 
     }
 
@@ -761,6 +772,9 @@ public class EditWaypointActivity extends AbstractActionBarActivity implements C
                             cache.createOriginalWaypoint(cache.getCoords());
                         }
                         cache.setCoords(waypoint.getCoords());
+                        if (waypointId == Waypoint.NONE_ID) {
+                            cache.deleteWaypoint(waypoint);
+                        }
                         DataStore.saveUserModifiedCoords(cache);
                     }
                 }
@@ -825,6 +839,13 @@ public class EditWaypointActivity extends AbstractActionBarActivity implements C
         final Intent intent = new Intent(context, EditWaypointActivity.class)
                 .putExtra(Intents.EXTRA_GEOCODE, cache.getGeocode())
                 .putExtra(Intents.EXTRA_WAYPOINT_ID, Waypoint.NEW_ID);
+        context.startActivity(intent);
+    }
+
+    public static void startActivitySetCoordinates(final Context context, final Geocache cache) {
+        final Intent intent = new Intent(context, EditWaypointActivity.class)
+                .putExtra(Intents.EXTRA_GEOCODE, cache.getGeocode())
+                .putExtra(Intents.EXTRA_WAYPOINT_ID, Waypoint.NONE_ID);
         context.startActivity(intent);
     }
 
