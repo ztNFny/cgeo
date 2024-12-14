@@ -323,6 +323,8 @@ public class SearchActivity extends AbstractNavigationBarActivity implements Coo
                     searchView.setText(searchTerm);
                     runnable.run();
                 });
+            } else {
+                binding.suggestionList.setAdapter(null);
             }
 
             updateSuggestions();
