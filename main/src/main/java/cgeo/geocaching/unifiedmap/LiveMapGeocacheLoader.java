@@ -1,11 +1,13 @@
 package cgeo.geocaching.unifiedmap;
 
+import cgeo.geocaching.R;
 import cgeo.geocaching.connector.ConnectorFactory;
 import cgeo.geocaching.enumerations.LoadFlags;
 import cgeo.geocaching.enumerations.StatusCode;
 import cgeo.geocaching.filters.core.GeocacheFilter;
 import cgeo.geocaching.location.Viewport;
 import cgeo.geocaching.models.Geocache;
+import cgeo.geocaching.settings.Settings;
 import cgeo.geocaching.utils.Log;
 
 import androidx.annotation.NonNull;
@@ -161,6 +163,11 @@ public class LiveMapGeocacheLoader {
 
                     //if we come here we HAVE to do an online request. Reset dirty state
                     this.loader.dirtyTime = -1;
+                }
+
+                if (Settings.getBoolean(R.string.pref_adv_livemap_offlineonly, false)) {
+                    setState(LoadState.STOPPED);
+                    return;
                 }
 
                 Log.iForce(LOGPRAEFIX + "START" + logParams);

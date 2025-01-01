@@ -301,6 +301,8 @@ public class UnifiedMapActivity extends AbstractNavigationBarMapActivity impleme
             }
         }));
 
+        Settings.putBoolean(R.string.pref_adv_livemap_offlineonly, false);
+
         refreshListChooser();
     }
 
@@ -646,7 +648,9 @@ public class UnifiedMapActivity extends AbstractNavigationBarMapActivity impleme
 
     @NonNull
     private String calculateTitle() {
-        if (TRUE.equals(viewModel.transientIsLiveEnabled.getValue())) {
+        if (Settings.getBoolean(R.string.pref_adv_livemap_offlineonly, false)) {
+            return getString(R.string.list_inbox);
+        } else if (TRUE.equals(viewModel.transientIsLiveEnabled.getValue())) {
             return getString(R.string.map_live);
         }
         if (viewModel.mapType.type == UMTT_TargetGeocode) {
@@ -808,6 +812,28 @@ public class UnifiedMapActivity extends AbstractNavigationBarMapActivity impleme
         final MenuItem itemMapLive = menu.findItem(R.id.menu_map_live);
         ToggleItemType.LIVE_MODE.toggleMenuItem(itemMapLive, TRUE.equals(viewModel.transientIsLiveEnabled.getValue()));
         itemMapLive.setVisible(true);
+        if (Settings.getBoolean(R.string.pref_adv_livemap_offlineonly, false)) {
+            itemMapLive.setIcon(R.drawable.ic_menu_sync_offline);
+        }
+
+        final View liveButton = findViewById(R.id.menu_map_live);
+        if (liveButton != null) {
+            liveButton.setOnLongClickListener(v -> {
+                Settings.putBoolean(R.string.pref_adv_livemap_offlineonly, Boolean.FALSE.equals(viewModel.transientIsLiveEnabled.getValue()));
+                Settings.setLiveMap(true); // will be toggled in the next step, so setting it to true actually sets it to false
+                onOptionsItemSelected(itemMapLive);
+                return true;
+            });
+
+            liveButton.setOnClickListener(v -> {
+                if (Settings.getBoolean(R.string.pref_adv_livemap_offlineonly, false)) {
+                    Settings.setLiveMap(false);
+                    Settings.putBoolean(R.string.pref_adv_livemap_offlineonly, false);
+                }
+                onOptionsItemSelected(itemMapLive);
+            });
+
+        }
 
         // map rotation state
         menu.findItem(R.id.menu_map_rotation).setVisible(true); // @todo: can be visible always (xml definition) when CGeoMap/NewMap is removed
