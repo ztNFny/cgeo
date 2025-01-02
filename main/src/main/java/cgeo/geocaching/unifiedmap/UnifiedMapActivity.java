@@ -103,6 +103,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -753,6 +754,15 @@ public class UnifiedMapActivity extends AbstractNavigationBarMapActivity impleme
         final MenuItem itemMapLive = menu.findItem(R.id.menu_map_live);
         ToggleItemType.LIVE_MODE.toggleMenuItem(itemMapLive, Boolean.TRUE.equals(viewModel.transientIsLiveEnabled.getValue()));
         itemMapLive.setVisible(true);
+
+        final View liveButton = findViewById(R.id.menu_map_live);
+        if (liveButton != null) {
+            liveButton.setOnLongClickListener(v -> {
+                Toast.makeText(getApplicationContext(), "Live map " + (Settings.isLiveMap() ? "ON" : "OFF"), Toast.LENGTH_SHORT).show();
+                return true;
+            });
+
+        }
 
         // map rotation state
         menu.findItem(R.id.menu_map_rotation).setVisible(true); // @todo: can be visible always (xml definition) when CGeoMap/NewMap is removed
