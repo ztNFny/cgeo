@@ -10,9 +10,11 @@ import androidx.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
@@ -562,8 +564,16 @@ public class GeopointParser {
     public static Geopoint parse(@NonNull final String text) {
         final Set<String> inputs = getParseInputs(text.trim());
         GeopointWrapper best = null;
+        // convert DD,DDDDDDD coordinates to DD.DDDDDDD
+        final Set<String> inputs2 = new HashSet<>(inputs);
+        for (String input : inputs) {
+            final Matcher m = Pattern.compile("^(\\d+),(\\d+), (\\d+),(\\d+)$").matcher(input);
+            if (m.matches()) {
+                inputs2.add(m.group(1) + "." + m.group(2) + ", " + m.group(3) + "." + m.group(4));
+            }
+        }
         for (final AbstractParser parser : parsers) {
-            for (final String input : inputs) {
+            for (final String input : inputs2) {
                 final GeopointWrapper geopointWrapper = parser.parse(input);
                 if (geopointWrapper == null) {
                     continue;
