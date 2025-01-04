@@ -23,7 +23,7 @@ public class LiveMapGeocacheLoader {
     private static final String LOGPRAEFIX = "LiveMapGeocacheLoader:";
 
     private static final long MIN_AGE_BETWEEN_ONLINE_REQUESTS = 3000; // 3 seconds
-    private static final long PROCESS_DELAY = 2000; // 2 seconds
+    public static final long PROCESS_DELAY = 2000; // 2 seconds
     private static final long CACHE_EXPIRY = 10 * 60000; // 10 minutes
 
     private final Disposable actionDisposable;
