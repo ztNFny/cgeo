@@ -1013,6 +1013,9 @@ public class UnifiedMapActivity extends AbstractNavigationBarMapActivity impleme
 
     private void refreshMapDataAfterSettingsChanged(final boolean circlesSwitched, final boolean filterChanged) {
         // parameter "circlesSwitched" is required for being called by showSettingsPopup only; can be removed after removing old map implementations
+        if (!viewModel.liveMapHandler.isEnabled() && filterChanged) {
+            reloadCachesAndWaypoints(false);
+        }
         refreshMapData(filterChanged);
     }
 
