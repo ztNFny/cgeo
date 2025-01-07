@@ -32,6 +32,8 @@ public class FilterUtils {
         // should not be instantiated
     }
 
+    private static final String GROUP_SEPARATOR = ":";
+
     public static void openFilterActivity(final Activity activity, final GeocacheFilterContext filterContext, final Collection<Geocache> filteredList) {
 
         GeocacheFilterActivity.selectFilter(
@@ -62,13 +64,7 @@ public class FilterUtils {
                 return true;
             }
 
-        final SimpleDialog.ItemSelectModel<GeocacheFilter> model = new SimpleDialog.ItemSelectModel<>();
-        model
-                .setChoiceMode(SimpleItemListModel.ChoiceMode.SINGLE_PLAIN)
-                .setItems(filters)
-                .setDisplayMapper((f) -> TextParam.text(f.getName()))
-                .activateGrouping(f -> getGroupFromFilterName(f.getName()))
-                .setGroupDisplayMapper(gi -> TextParam.text("**" + gi.getGroup() + "** *(" + gi.getContainedItemCount() + ")*").setMarkdown(true));
+        final SimpleDialog.ItemSelectModel<GeocacheFilter> model = getGroupedFilterList(filters);
 
         if (isFilterActive) {
             SimpleDialog.of(filteredActivity).setTitle(R.string.cache_filter_storage_select_clear_title)
@@ -83,11 +79,38 @@ public class FilterUtils {
         return true;
     }
 
+    public static SimpleDialog.ItemSelectModel<GeocacheFilter> getGroupedFilterList(final List<GeocacheFilter> filters) {
+        final SimpleDialog.ItemSelectModel<GeocacheFilter> model = new SimpleDialog.ItemSelectModel<>();
+        model
+                .setChoiceMode(SimpleItemListModel.ChoiceMode.SINGLE_PLAIN)
+                .setItems(filters)
+                .setDisplayMapper((f, gi) -> {
+                    String title = f.getName();
+                    final String parentGroup = gi == null || gi.getGroup() == null ? "" : gi.getGroup().toString();
+                    if (title.startsWith(parentGroup + GROUP_SEPARATOR)) {
+                        title = title.substring(parentGroup.length() + 1);
+                    }
+                    return TextParam.text(title);
+                }, (f, gi) -> f.getName(), null)
+                .activateGrouping(f -> getGroupFromFilterName(f.getName()))
+                .setGroupPruner(gi -> gi.getSize() >= 2)
+                .setGroupGroupMapper(FilterUtils::getGroupFromFilterName)
+                .setGroupDisplayMapper(gi -> {
+                    final String parentGroup = gi.getParent() == null || gi.getParent().getGroup() == null ? "" : gi.getParent().getGroup();
+                    String title = gi.getGroup();
+                    if (title.startsWith(parentGroup + GROUP_SEPARATOR)) {
+                        title = title.substring(parentGroup.length() + 1);
+                    }
+                    return TextParam.text("**" + title + "** *(" + gi.getContainedItemCount() + ")*").setMarkdown(true);
+                });
+        return model;
+    }
+
     public static String getGroupFromFilterName(final String group) {
         if (group == null) {
             return null;
         }
-        final int idx = group.lastIndexOf(":");
+        final int idx = group.lastIndexOf(GROUP_SEPARATOR);
         return idx <= 0 ? null : group.substring(0, idx);
     }
 
