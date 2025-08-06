@@ -271,11 +271,7 @@ public final class StoredList extends AbstractList {
                     return ImageParam.emoji(((StoredList) item).markerId, 30);
                 }
             } else if (item instanceof PseudoList) {
-                if (item.id == PseudoList.ALL_LIST.id) {
-                    return ImageParam.id(R.drawable.ic_menu_list_group);
-                } else if (item.id == PseudoList.HISTORY_LIST.id) {
-                    return ImageParam.id(R.drawable.ic_menu_recent_history);
-                }
+                return ImageParam.id(((PseudoList) item).getIcon());
             }
             if (isGroup) {
                 return ImageParam.id(R.drawable.downloader_folder);
