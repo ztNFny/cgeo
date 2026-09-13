@@ -43,7 +43,7 @@ public class OAuth {
         final String requestPacked = method + '&' + Parameters.percentEncode((https ? "https" : "http") + "://" + host + path) + '&' +
                 Parameters.percentEncode(params.toString());
         final String keysPacked = Parameters.percentEncode(consumerSecret) + '&' + Parameters.percentEncode(StringUtils.defaultString(tokenSecret)); // both even if empty some of them!
-        return CryptUtils.base64Encode(CryptUtils.hashHmac(requestPacked, keysPacked));
+        return CryptUtils.base64Encode(CryptUtils.hashHmac(requestPacked, keysPacked, "HmacSHA1"));
     }
 
 }

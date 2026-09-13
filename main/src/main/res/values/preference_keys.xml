@@ -138,6 +138,15 @@
     <string translatable="false" name="pref_fakekey_geokrety_website">fakekey_geokrety_website</string>
     <string translatable="false" name="pref_fakekey_geokretymap_website">fakekey_geokretymap_website</string>
 
+    <!-- settings for project-gc.com screen -->
+    <string translatable="false" name="preference_screen_projectgc">preference_screen_projectgc</string>
+    <string translatable="false" name="pref_connectorProjectGCActive">connectorProjectGCActive</string>
+    <string translatable="false" name="pref_pgc_access_token">pgc_access_token</string>
+    <string translatable="false" name="pref_pgc_user_id">pgc_user_id</string>
+    <string translatable="false" name="pref_fakekey_pgc_get_token">fakekey_pgc_get_token</string>
+    <string translatable="false" name="pref_fakekey_pgc_website">fakekey_pgc_website</string>
+    <string translatable="false" name="pref_fakekey_pgc_settings">fakekey_pgc_settings</string>
+
     <!-- settings for send2cgeo screen -->
     <string translatable="false" name="preference_screen_sendtocgeo">preference_screen_sendtocgeo</string>
     <string translatable="false" name="pref_webDeviceName">webDeviceName</string>
@@ -456,6 +465,7 @@
     <string translatable="false" name="pref_username">username</string>
     <string translatable="false" name="pref_password">password</string>
     <string translatable="false" name="pref_gc_avatar">gc_avatar</string>
+    <string translatable="false" name="pref_gc_userref">gc_userref</string>
     <string translatable="false" name="pref_memberstatus">memberstatus</string>
     <string translatable="false" name="pref_gccustomdate">gccustomdate</string>
     <string translatable="false" name="pref_gcLastLoginErrorStatus">gcLastLoginErrorStatus</string>

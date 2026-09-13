@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <!-- Google Maps -->
     <string name="maps_api2_key" translatable="false">@maps.api2.key@</string>
 
@@ -33,4 +33,7 @@
 
     <!-- Geocaching.com public ALC API -->
     <string name="alc_consumer_key" translatable="false">@alc.consumer.key@</string>
+
+    <!-- Project-GC API -->
+    <string name="projectgc_consumer_key" translatable="false">@projectgc.consumer.key@</string>
 </resources>

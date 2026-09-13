@@ -2428,6 +2428,19 @@
     <string name="confirm_report_problem_title">Report problem</string>
     <string name="confirm_report_problem_message">You want to report \'%s\'. Are you sure?</string>
 
+    <!-- Project-GC -->
+    <string name="init_projectgc">Project-GC</string>
+    <string name="init_summary_projectgc">Enable Project-GC services</string>
+    <string name="pgc_access_token_title">Access token</string>
+    <string name="pgc_user_id_title">User ID</string>
+    <string name="pgc_get_access_token">Get Access token</string>
+    <string name="pgc_settings_description">Copy the \'Project-GC Access token\' from https://project-gc.com/User/Settings into the field above.</string>
+    <string name="menu_lists_vgps">Virtual GPS (PGC)</string>
+    <string name="search_vgps_loading">Loading Virtual GPS lists&#8230;</string>
+    <string name="err_read_vgps_list">Could not read Virtual GPS lists</string>
+    <string name="warn_no_vgps_found">No Virtual GPS lists found</string>
+    <string name="vgps_loading_caches">Loading caches from Virtual GPS&#8230;</string>
+
     <!-- Geokrety -->
     <string name="init_summary_geokrety">Enable trackables from GeoKrety.org</string>
     <string name="init_geokrety_description">Authorize c:geo with GeoKrety.org to log GeoKrety trackables.</string>

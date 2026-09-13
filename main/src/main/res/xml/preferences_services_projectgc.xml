@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:key="@string/preference_screen_projectgc"
+    android:title="@string/init_projectgc" >
+
+    <PreferenceCategory
+        android:title="@string/settings_settings"
+        app:iconSpaceReserved="false" >
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="@string/pref_connectorProjectGCActive"
+            android:summary="@string/init_summary_projectgc"
+            android:title="@string/settings_service_activate"
+            app:iconSpaceReserved="false" />
+        <EditTextPreference
+            android:dependency="@string/pref_connectorProjectGCActive"
+            android:key="@string/pref_pgc_access_token"
+            android:title="@string/pgc_access_token_title"
+            app:iconSpaceReserved="false" />
+        <Preference
+            android:dependency="@string/pref_connectorProjectGCActive"
+            android:key="@string/pref_fakekey_pgc_get_token"
+            android:title="@string/pgc_get_access_token"
+            app:summary="@string/pgc_settings_description"
+            app:iconSpaceReserved="false" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/settings_information"
+        app:iconSpaceReserved="false" >
+        <Preference
+            android:key="@string/pref_fakekey_pgc_website"
+            android:title="@string/settings_open_website"
+            app:iconSpaceReserved="false" />
+    </PreferenceCategory>
+</PreferenceScreen>

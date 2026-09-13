@@ -118,6 +118,13 @@
             app:title="@string/init_geokrety"
             app:iconSpaceReserved="false" />
 
+        <!-- Project-GC -->
+        <Preference
+            android:key="@string/pref_fakekey_pgc_settings"
+            app:fragment="cgeo.geocaching.settings.fragments.PreferenceServiceProjectGCFragment"
+            app:title="@string/init_projectgc"
+            app:iconSpaceReserved="false" />
+
         <!-- Send2cgeo -->
         <Preference
             android:key="@string/pref_fakekey_sendtocgeo_info"

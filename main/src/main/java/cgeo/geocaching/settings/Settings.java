@@ -665,6 +665,21 @@ public class Settings {
         return StringUtils.trim(getString(R.string.pref_username, StringUtils.EMPTY));
     }
 
+    /** this method is to be solely used for auto-fixing GC username, see MainActivity.UpdateUserInfoHandler */
+    public static void setGCUserName(final String username) {
+        if (StringUtils.isNotBlank(username)) {
+            putString(R.string.pref_username, username);
+        }
+    }
+
+    public static void setGCUserRef(final String userRef) {
+        putString(R.string.pref_gc_userref, userRef);
+    }
+
+    public static String getGCUserId() {
+        return getString(R.string.pref_gc_userref, "");
+    }
+
     public static boolean isGCConnectorActive() {
         return getBoolean(R.string.pref_connectorGCActive, false);
     }
@@ -931,6 +946,22 @@ public class Settings {
 
     public static boolean isRegisteredForGeokretyLogging() {
         return getGeokretySecId() != null;
+    }
+
+    public static boolean isProjectGCConnectorActive() {
+        return getBoolean(R.string.pref_connectorProjectGCActive, false);
+    }
+
+    public static boolean hasProjectGCAuthorization() {
+        return StringUtils.isNotBlank(getProjectGCAccessToken());
+    }
+
+    public static String getProjectGCAccessToken() {
+        return getString(R.string.pref_pgc_access_token, null);
+    }
+
+    public static void setProjectGCAccessToken(final String token) {
+        putString(R.string.pref_pgc_access_token, token);
     }
 
     /**
@@ -2214,17 +2245,16 @@ public class Settings {
     public static HashSet<String> getSensitivePreferenceKeys(final Context context) {
         final HashSet<String> sensitiveKeys = new HashSet<>();
         Collections.addAll(sensitiveKeys,
-                context.getString(R.string.pref_username), context.getString(R.string.pref_password),
-                context.getString(R.string.pref_ecusername), context.getString(R.string.pref_ecpassword),
-                context.getString(R.string.pref_user_vote), context.getString(R.string.pref_pass_vote),
-                context.getString(R.string.pref_ocde_tokensecret), context.getString(R.string.pref_ocde_tokenpublic), context.getString(R.string.pref_temp_ocde_token_secret), context.getString(R.string.pref_temp_ocde_token_public),
-                context.getString(R.string.pref_ocpl_tokensecret), context.getString(R.string.pref_ocpl_tokenpublic), context.getString(R.string.pref_temp_ocpl_token_secret), context.getString(R.string.pref_temp_ocpl_token_public),
-                context.getString(R.string.pref_ocnl_tokensecret), context.getString(R.string.pref_ocnl_tokenpublic), context.getString(R.string.pref_temp_ocnl_token_secret), context.getString(R.string.pref_temp_ocnl_token_public),
-                context.getString(R.string.pref_ocus_tokensecret), context.getString(R.string.pref_ocus_tokenpublic), context.getString(R.string.pref_temp_ocus_token_secret), context.getString(R.string.pref_temp_ocus_token_public),
-                context.getString(R.string.pref_ocro_tokensecret), context.getString(R.string.pref_ocro_tokenpublic), context.getString(R.string.pref_temp_ocro_token_secret), context.getString(R.string.pref_temp_ocro_token_public),
-                context.getString(R.string.pref_ocuk2_tokensecret), context.getString(R.string.pref_ocuk2_tokenpublic), context.getString(R.string.pref_temp_ocuk2_token_secret), context.getString(R.string.pref_temp_ocuk2_token_public),
-                context.getString(R.string.pref_su_tokensecret), context.getString(R.string.pref_su_tokenpublic), context.getString(R.string.pref_temp_su_token_secret), context.getString(R.string.pref_temp_su_token_public),
-                context.getString(R.string.pref_fakekey_geokrety_authorization)
+                LocalizationUtils.getPlainString(R.string.pref_username), LocalizationUtils.getPlainString(R.string.pref_password),
+                LocalizationUtils.getPlainString(R.string.pref_ocde_tokensecret), LocalizationUtils.getPlainString(R.string.pref_ocde_tokenpublic), LocalizationUtils.getPlainString(R.string.pref_temp_ocde_token_secret), LocalizationUtils.getPlainString(R.string.pref_temp_ocde_token_public),
+                LocalizationUtils.getPlainString(R.string.pref_ocpl_tokensecret), LocalizationUtils.getPlainString(R.string.pref_ocpl_tokenpublic), LocalizationUtils.getPlainString(R.string.pref_temp_ocpl_token_secret), LocalizationUtils.getPlainString(R.string.pref_temp_ocpl_token_public),
+                LocalizationUtils.getPlainString(R.string.pref_ocnl_tokensecret), LocalizationUtils.getPlainString(R.string.pref_ocnl_tokenpublic), LocalizationUtils.getPlainString(R.string.pref_temp_ocnl_token_secret), LocalizationUtils.getPlainString(R.string.pref_temp_ocnl_token_public),
+                LocalizationUtils.getPlainString(R.string.pref_ocus_tokensecret), LocalizationUtils.getPlainString(R.string.pref_ocus_tokenpublic), LocalizationUtils.getPlainString(R.string.pref_temp_ocus_token_secret), LocalizationUtils.getPlainString(R.string.pref_temp_ocus_token_public),
+                LocalizationUtils.getPlainString(R.string.pref_ocro_tokensecret), LocalizationUtils.getPlainString(R.string.pref_ocro_tokenpublic), LocalizationUtils.getPlainString(R.string.pref_temp_ocro_token_secret), LocalizationUtils.getPlainString(R.string.pref_temp_ocro_token_public),
+                LocalizationUtils.getPlainString(R.string.pref_ocuk2_tokensecret), LocalizationUtils.getPlainString(R.string.pref_ocuk2_tokenpublic), LocalizationUtils.getPlainString(R.string.pref_temp_ocuk2_token_secret), LocalizationUtils.getPlainString(R.string.pref_temp_ocuk2_token_public),
+                LocalizationUtils.getPlainString(R.string.pref_su_tokensecret), LocalizationUtils.getPlainString(R.string.pref_su_tokenpublic), LocalizationUtils.getPlainString(R.string.pref_temp_su_token_secret), LocalizationUtils.getPlainString(R.string.pref_temp_su_token_public),
+                LocalizationUtils.getPlainString(R.string.pref_fakekey_geokrety_authorization),
+                LocalizationUtils.getPlainString(R.string.pref_cookiejar)
         );
         return sensitiveKeys;
     }
