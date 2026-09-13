@@ -464,6 +464,10 @@ public class GCLogin extends AbstractLogin {
                 AvatarUtils.changeAvatar(GCConnector.getInstance(), avatarUrl);
             }
 
+            if (StringUtils.isNotBlank(serverParameters.userInfo.referenceCode)) {
+                Settings.setGCUserRef(serverParameters.userInfo.referenceCode);
+            }
+
             // check for race condition while logging in
             if (StringUtils.isBlank(serverParameters.userInfo.userType)) {
                 resetServerParameters(); // not yet logged in, thus try to read again on next call

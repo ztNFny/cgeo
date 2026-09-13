@@ -97,16 +97,24 @@ public final class CryptUtils {
     }
 
     @NonNull
-    public static byte[] hashHmac(final String text, final String salt) {
+    public static byte[] hashHmac(final String text, final String salt, final String algorithm) {
         try {
-            final SecretKeySpec secretKeySpec = new SecretKeySpec(salt.getBytes(StandardCharsets.UTF_8), "HmacSHA1");
-            final Mac mac = Mac.getInstance("HmacSHA1");
+            final SecretKeySpec secretKeySpec = new SecretKeySpec(salt.getBytes(StandardCharsets.UTF_8), algorithm);
+            final Mac mac = Mac.getInstance(algorithm);
             mac.init(secretKeySpec);
             return mac.doFinal(text.getBytes(StandardCharsets.UTF_8));
         } catch (GeneralSecurityException e) {
             Log.e("CryptUtils.hashHmac", e);
             return EMPTY;
         }
+    }
+
+    public static String bytesToHex(byte[] bytes) {
+        StringBuilder sb = new StringBuilder(bytes.length * 2);
+        for (byte b : bytes) {
+            sb.append(String.format("%02x", b));
+        }
+        return sb.toString();
     }
 
     @NonNull

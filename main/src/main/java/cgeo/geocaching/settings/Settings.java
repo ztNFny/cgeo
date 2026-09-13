@@ -764,6 +764,14 @@ public class Settings {
         }
     }
 
+    public static void setGCUserRef(final String userRef) {
+        putString(R.string.pref_gc_userref, userRef);
+    }
+
+    public static String getGCUserId() {
+        return getString(R.string.pref_gc_userref, "");
+    }
+
     public static boolean isGCConnectorActive() {
         return getBoolean(R.string.pref_connectorGCActive, false);
     }
@@ -1079,6 +1087,22 @@ public class Settings {
 
     public static boolean isRegisteredForGeokretyLogging() {
         return getGeokretySecId() != null;
+    }
+
+    public static boolean isProjectGCConnectorActive() {
+        return getBoolean(R.string.pref_connectorProjectGCActive, false);
+    }
+
+    public static boolean hasProjectGCAuthorization() {
+        return StringUtils.isNotBlank(getProjectGCAccessToken());
+    }
+
+    public static String getProjectGCAccessToken() {
+        return getString(R.string.pref_pgc_access_token, null);
+    }
+
+    public static void setProjectGCAccessToken(final String token) {
+        putString(R.string.pref_pgc_access_token, token);
     }
 
     /**
@@ -2601,6 +2625,7 @@ public class Settings {
                 LocalizationUtils.getPlainString(R.string.pref_ocuk2_tokensecret), LocalizationUtils.getPlainString(R.string.pref_ocuk2_tokenpublic), LocalizationUtils.getPlainString(R.string.pref_temp_ocuk2_token_secret), LocalizationUtils.getPlainString(R.string.pref_temp_ocuk2_token_public),
                 LocalizationUtils.getPlainString(R.string.pref_su_tokensecret), LocalizationUtils.getPlainString(R.string.pref_su_tokenpublic), LocalizationUtils.getPlainString(R.string.pref_temp_su_token_secret), LocalizationUtils.getPlainString(R.string.pref_temp_su_token_public),
                 LocalizationUtils.getPlainString(R.string.pref_fakekey_geokrety_authorization),
+                LocalizationUtils.getPlainString(R.string.pref_pgc_access_token),
                 LocalizationUtils.getPlainString(R.string.pref_cookiejar)
         );
         return sensitiveKeys;

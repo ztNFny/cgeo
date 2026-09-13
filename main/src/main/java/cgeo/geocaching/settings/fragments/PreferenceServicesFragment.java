@@ -29,6 +29,7 @@ public class PreferenceServicesFragment extends BasePreferenceFragment {
         setPrefSummaryActiveStatus(this, R.string.pref_fakekey_ec_authorization, Settings.isECConnectorActive());
         setPrefSummaryActiveStatus(this, R.string.pref_fakekey_su_authorization, Settings.isSUConnectorActive());
         setPrefSummaryActiveStatus(this, R.string.pref_fakekey_geokrety_authorization, Settings.isGeokretyConnectorActive());
+        setPrefSummaryActiveStatus(this, R.string.pref_fakekey_pgc_settings, Settings.isProjectGCConnectorActive());
         setPrefSummaryActiveStatus(this, R.string.pref_fakekey_sendtocgeo_info, Settings.isRegisteredForSend2cgeo());
         setPrefSummaryActiveStatus(this, R.string.pref_fakekey_bettercacher_settings, Settings.isBetterCacherConnectorActive());
     }

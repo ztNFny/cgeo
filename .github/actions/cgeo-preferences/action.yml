@@ -70,6 +70,9 @@ inputs:
   ALC_CONSUMER_KEY:
     description: Geocaching.com public API for Adventure Labs
     required: false
+  PROJECTGC_CONSUMER_KEY:
+    description: Project-GC.com API key
+    required: false
   PREF_COOKIESTORE:
     description: cgeo preferences xml cookiestore value
     required: true
@@ -236,4 +239,7 @@ runs:
 
         # Geocaching.com public API for Adventure Labs
         alc.consumer.key=${{ inputs.ALC_CONSUMER_KEY }}
+
+        # Project-GC.com API key
+        projectgc_consumer_key=${{ inputs.PROJECTGC_CONSUMER_KEY }}
         EOF

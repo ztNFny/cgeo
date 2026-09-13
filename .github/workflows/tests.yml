@@ -198,6 +198,7 @@ jobs:
           SU_CONSUMER_SECRET: ${{ secrets.SU_CONSUMER_SECRET }}
           THUNDERFOREST_API_KEY: ${{ secrets.THUNDERFOREST_API_KEY }}
           ALC_CONSUMER_KEY: ${{ secrets.ALC_CONSUMER_KEY }}
+          PROJECTGC_CONSUMER_KEY: ${{ secrets.PROJECTGC_CONSUMER_KEY }}
           PREF_COOKIESTORE: ${{ secrets.PREF_COOKIESTORE }}
           PREF_USERNAME: ${{ secrets.PREF_USERNAME }}
           PREF_PASSWORD: ${{ secrets.PREF_PASSWORD }}
@@ -283,6 +284,7 @@ jobs:
           SU_CONSUMER_SECRET: ${{ secrets.SU_CONSUMER_SECRET }}
           THUNDERFOREST_API_KEY: ${{ secrets.THUNDERFOREST_API_KEY }}
           ALC_CONSUMER_KEY: ${{ secrets.ALC_CONSUMER_KEY }}
+          PROJECTGC_CONSUMER_KEY: ${{ secrets.PROJECTGC_CONSUMER_KEY }}
           PREF_COOKIESTORE: ${{ secrets.PREF_COOKIESTORE }}
           PREF_USERNAME: ${{ secrets.PREF_USERNAME }}
           PREF_PASSWORD: ${{ secrets.PREF_PASSWORD }}
@@ -387,6 +389,7 @@ jobs:
           SU_CONSUMER_SECRET: ${{ secrets.SU_CONSUMER_SECRET }}
           THUNDERFOREST_API_KEY: ${{ secrets.THUNDERFOREST_API_KEY }}
           ALC_CONSUMER_KEY: ${{ secrets.ALC_CONSUMER_KEY }}
+          PROJECTGC_CONSUMER_KEY: ${{ secrets.PROJECTGC_CONSUMER_KEY }}
           PREF_COOKIESTORE: ${{ secrets.PREF_COOKIESTORE }}
           PREF_USERNAME: ${{ secrets.PREF_USERNAME }}
           PREF_PASSWORD: ${{ secrets.PREF_PASSWORD }}

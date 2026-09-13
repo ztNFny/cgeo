@@ -68,6 +68,10 @@ public final class GCUtils {
         return codeToId("GL", logCode);
     }
 
+    public static long userCodeToUserId(@Nullable final String logCode) {
+        return codeToId("PR", logCode);
+    }
+
     /**
      * Converts logId to LogCode. For invalid id's, empty string will be returned (never null)
      */
