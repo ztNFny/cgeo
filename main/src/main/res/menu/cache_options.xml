@@ -81,6 +81,11 @@
         app:showAsAction="ifRoom">
     </item>
     <item
+        android:id="@+id/menu_pgc_run_challenge_checker"
+        android:title="@string/pgc_run_challenge_checker"
+        android:visible="false"
+        app:showAsAction="never"/>
+    <item
         android:id="@+id/menu_log_in_browser"
         android:title="@string/cache_menu_log_in_browser"
         android:visible="false"

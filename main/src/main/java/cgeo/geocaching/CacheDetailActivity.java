@@ -23,6 +23,8 @@ import cgeo.geocaching.connector.capability.PersonalNoteCapability;
 import cgeo.geocaching.connector.capability.PgcChallengeCheckerCapability;
 import cgeo.geocaching.connector.capability.WatchListCapability;
 import cgeo.geocaching.connector.internal.InternalConnector;
+import cgeo.geocaching.connector.pgc.ProjectGCAPI;
+import cgeo.geocaching.connector.pgc.ProjectGCConnector;
 import cgeo.geocaching.connector.trackable.TrackableBrand;
 import cgeo.geocaching.connector.trackable.TrackableConnector;
 import cgeo.geocaching.contacts.ContactsHelper;
@@ -673,8 +675,9 @@ public class CacheDetailActivity extends TabbedViewPagerActivity
         if (cache != null) {
             // top level menu items
             menu.findItem(R.id.menu_tts_toggle).setVisible(!cache.isGotoHistoryUDC());
-            if (connector instanceof PgcChallengeCheckerCapability) {
-                menu.findItem(R.id.menu_challenge_checker).setVisible(((PgcChallengeCheckerCapability) connector).isChallengeCache(cache));
+            if (connector instanceof PgcChallengeCheckerCapability && ((PgcChallengeCheckerCapability) connector).isChallengeCache(cache)) {
+                menu.findItem(R.id.menu_challenge_checker).setVisible(true);
+                menu.findItem(R.id.menu_pgc_run_challenge_checker).setVisible(ProjectGCConnector.INSTANCE.isActive() && ProjectGCConnector.INSTANCE.hasAuthorization());
             }
             menu.findItem(R.id.menu_edit_fieldnote).setVisible(true);
 
@@ -725,6 +728,8 @@ public class CacheDetailActivity extends TabbedViewPagerActivity
             showVoteDialog();
         } else if (menuItem == R.id.menu_challenge_checker) {
             ShareUtils.openUrl(this, "https://project-gc.com/Challenges/" + cache.getGeocode());
+        } else if (menuItem == R.id.menu_pgc_run_challenge_checker) {
+            runPgcChallengeCheck();
         } else if (menuItem == R.id.menu_ignore) {
             ignoreCache();
         } else if (menuItem == R.id.menu_extract_waypoints) {
@@ -755,7 +760,9 @@ public class CacheDetailActivity extends TabbedViewPagerActivity
         } else if (menuItem == R.id.menu_tts_toggle) {
             SpeechService.toggleService(this, cache.getCoords());
         } else if (menuItem == R.id.menu_set_cache_icon) {
-            EmojiUtils.selectEmojiPopup(this, cache.getAssignedEmoji(), cache, this::setCacheIcon);
+            EmojiUtils.selectEmojiPopup(this, cache.getAssignedEmoji(), false, cache, this::setCacheIcon);
+        } else if (menuItem == R.id.menu_change_description_style) {
+            changeDescriptionStyle();
         } else if (LoggingUI.onMenuItemSelected(item, this, cache, null)) {
             refreshOnResume = true;
         } else {
@@ -768,11 +775,30 @@ public class CacheDetailActivity extends TabbedViewPagerActivity
         ShareUtils.openUrl(activity, CheckerUtils.getCheckerUrl(cache), true);
     }
 
-    private void setCacheIcon(final int newCacheIcon) {
+    private void setCacheIcon(final String newCacheIcon) {
+        ensureSaved();
         cache.setAssignedEmoji(newCacheIcon);
-        DataStore.saveCache(cache, LoadFlags.SAVE_ALL);
-        Toast.makeText(this, R.string.cache_icon_updated, Toast.LENGTH_SHORT).show();
+        saveAndNotify(LoadFlags.SAVE_ALL);
+        ViewUtils.showShortToast(this, R.string.cache_icon_updated);
         notifyDataSetChanged();
+    }
+
+    private void runPgcChallengeCheck() {
+        final String geocode = cache.getGeocode();
+        AndroidRxUtils.networkScheduler.scheduleDirect(() -> {
+            final Boolean result = ProjectGCAPI.checkChallenge(geocode);
+            runOnUiThread(() -> {
+                if (result == null) {
+                    showToast(R.string.pgc_challenge_check_error);
+                    return;
+                }
+                if (Settings.getPgcChallengeUpdateCacheIcon()) {
+                    final String newCacheIcon = result ? Settings.getPgcChallengeSuccessIcon() : Settings.getPgcChallengeFailureIcon();
+                    setCacheIcon(newCacheIcon, false);
+                }
+                showToast(result ? R.string.pgc_challenge_check_passed : R.string.pgc_challenge_check_failed);
+            });
+        });
     }
 
     private void ignoreCache() {

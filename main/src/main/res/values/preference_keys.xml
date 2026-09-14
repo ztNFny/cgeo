@@ -146,6 +146,9 @@
     <string translatable="false" name="pref_fakekey_pgc_get_token">fakekey_pgc_get_token</string>
     <string translatable="false" name="pref_fakekey_pgc_website">fakekey_pgc_website</string>
     <string translatable="false" name="pref_fakekey_pgc_settings">fakekey_pgc_settings</string>
+    <string translatable="false" name="pref_pgc_challenge_update_cache_icon">pgc_challenge_update_cache_icon</string>
+    <string translatable="false" name="pref_pgc_challenge_success_icon">pgc_challenge_success_icon</string>
+    <string translatable="false" name="pref_pgc_challenge_failure_icon">pgc_challenge_failure_icon</string>
 
     <!-- settings for send2cgeo screen -->
     <string translatable="false" name="preference_screen_sendtocgeo">preference_screen_sendtocgeo</string>

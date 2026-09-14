@@ -964,6 +964,18 @@ public class Settings {
         putString(R.string.pref_pgc_access_token, token);
     }
 
+    public static boolean getPgcChallengeUpdateCacheIcon() {
+        return getBoolean(R.string.pref_pgc_challenge_update_cache_icon, true);
+    }
+
+    public static String getPgcChallengeSuccessIcon() {
+        return getString(R.string.pref_pgc_challenge_success_icon, "✅");
+    }
+
+    public static String getPgcChallengeFailureIcon() {
+        return getString(R.string.pref_pgc_challenge_failure_icon, "⛔");
+    }
+
     /**
      * Retrieve showed popup counter for warning about logging Trackable recommend Geocode
      *

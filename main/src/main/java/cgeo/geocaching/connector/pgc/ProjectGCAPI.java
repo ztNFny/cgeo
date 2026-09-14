@@ -142,6 +142,21 @@ public final class ProjectGCAPI {
         return null;
     }
 
+    /** Checks the challenge cache eligibility for the current user. Returns true/false, or null on error. */
+    @Nullable
+    public static Boolean checkChallenge(final String gcCode) {
+        try {
+            final JsonNode response = get("/challenge-checker/gccode:" + gcCode + "/prcode:" + Settings.getGCUserId() + "/cached");
+            if (response == null || !response.isArray() || response.isEmpty()) {
+                return null;
+            }
+            return response.get(0).path("status").asBoolean();
+        } catch (final Exception e) {
+            Log.w("ProjectGCAPI: checkChallenge failed for " + gcCode, e);
+            return null;
+        }
+    }
+
     public static boolean isPlusUser() {
         final JsonNode result = get("/test/pgc-plus");
         return result.asText().equals("Project-GC Plus membership confirmed.");
