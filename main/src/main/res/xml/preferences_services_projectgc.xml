@@ -28,6 +28,31 @@
     </PreferenceCategory>
 
     <PreferenceCategory
+        android:title="@string/pgc_challenge_checker"
+        app:iconSpaceReserved="false" >
+        <CheckBoxPreference
+            android:dependency="@string/pref_connectorProjectGCActive"
+            android:key="@string/pref_pgc_challenge_update_cache_icon"
+            android:defaultValue="true"
+            android:title="@string/pgc_challenge_update_cache_icon"
+            android:summaryOn="@string/pgc_challenge_update_cache_icon_on"
+            android:summaryOff="@string/pgc_challenge_update_cache_icon_off"
+            app:iconSpaceReserved="false" />
+        <EditTextPreference
+            android:dependency="@string/pref_pgc_challenge_update_cache_icon"
+            android:key="@string/pref_pgc_challenge_success_icon"
+            android:defaultValue="✅"
+            android:title="@string/pgc_challenge_icon_fulfilled"
+            app:iconSpaceReserved="false" />
+        <EditTextPreference
+            android:dependency="@string/pref_pgc_challenge_update_cache_icon"
+            android:key="@string/pref_pgc_challenge_failure_icon"
+            android:defaultValue="⛔"
+            android:title="@string/pgc_challenge_icon_not_fulfilled"
+            app:iconSpaceReserved="false" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
         android:title="@string/settings_information"
         app:iconSpaceReserved="false" >
         <Preference
