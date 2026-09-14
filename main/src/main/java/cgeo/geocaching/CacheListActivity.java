@@ -25,7 +25,9 @@ import cgeo.geocaching.connector.gc.BookmarkListActivity;
 import cgeo.geocaching.connector.gc.BookmarkUtils;
 import cgeo.geocaching.connector.gc.PocketQueryListActivity;
 import cgeo.geocaching.connector.internal.InternalConnector;
+import cgeo.geocaching.connector.pgc.ProjectGCConnector;
 import cgeo.geocaching.enumerations.CacheListType;
+import cgeo.geocaching.enumerations.CacheType;
 import cgeo.geocaching.enumerations.LoadFlags;
 import cgeo.geocaching.enumerations.StatusCode;
 import cgeo.geocaching.export.BatchUploadModifiedCoordinates;
@@ -68,6 +70,7 @@ import cgeo.geocaching.sensors.GeoDirHandler;
 import cgeo.geocaching.sensors.LocationDataProvider;
 import cgeo.geocaching.service.CacheDownloaderService;
 import cgeo.geocaching.service.GeocacheChangedBroadcastReceiver;
+import cgeo.geocaching.service.PgcChallengeCheckerBatchService;
 import cgeo.geocaching.settings.Settings;
 import cgeo.geocaching.settings.SettingsActivity;
 import cgeo.geocaching.sorting.GeocacheSort;
@@ -454,6 +457,7 @@ public class CacheListActivity extends AbstractListActivity implements FilteredA
                     if (geocache != null) {
                         adapter.setElement(geocache);
                     }
+                    updateAdapter();
                 }
             }
         });
@@ -647,6 +651,13 @@ public class CacheListActivity extends AbstractListActivity implements FilteredA
             //MenuUtils.setVisibleEnabled(menu, R.id.menu_upload_bookmarklist, isGcPremiumMember, !isEmpty);
             MenuUtils.setVisibleEnabled(menu, R.id.menu_upload_bookmarklist, true, !isEmpty);
             setMenuItemLabel(menu, R.id.menu_upload_bookmarklist, R.string.caches_upload_bookmarklist_selected, R.string.caches_upload_bookmarklist_all, checkedCount);
+
+            final boolean hasPgcChallengeCheckable = Settings.getPgcChallengeUpdateCacheIcon()
+                    && ProjectGCConnector.INSTANCE.isActive()
+                    && ProjectGCConnector.INSTANCE.hasAuthorization()
+                    && adapter.getCheckedOrAllCaches().stream().anyMatch(c -> c.getType() == CacheType.MYSTERY);
+            MenuUtils.setVisibleEnabled(menu, R.id.menu_pgc_challenge_check_batch, hasPgcChallengeCheckable, hasPgcChallengeCheckable);
+            setMenuItemLabel(menu, R.id.menu_pgc_challenge_check_batch, R.string.pgc_challenge_check_batch, R.string.pgc_challenge_check_batch, checkedCount);
 
             MenuUtils.setVisible(menu, R.id.menu_watch_management, WatchListUtils.anySupportsWatchlist(adapter.getCheckedOrAllCaches()));
             MenuUtils.setVisibleEnabled(menu, R.id.menu_watch_all, WatchListUtils.anySupportsWatchlist(adapter.getCheckedOrAllCaches()), WatchListUtils.anySupportsWatching(adapter.getCheckedOrAllCaches()));
@@ -929,6 +940,8 @@ public class CacheListActivity extends AbstractListActivity implements FilteredA
             new PersonalNoteStoreArtefactCommand(this, adapter.getCheckedOrAllCaches(), () -> refreshCurrentList()).execute();
         } else if (menuItem == R.id.menu_upload_bookmarklist) {
             BookmarkUtils.askAndUploadCachesToBookmarkList(this, adapter.getCheckedOrAllCaches());
+        } else if (menuItem == R.id.menu_pgc_challenge_check_batch) {
+            PgcChallengeCheckerBatchService.start(this, adapter.getCheckedOrAllCaches());
         } else if (menuItem == R.id.menu_watch_all) {
             WatchListUtils.watchAll(this, adapter.getCheckedOrAllCaches());
         } else if (menuItem == R.id.menu_unwatch_all) {
