@@ -972,8 +972,16 @@ public class Settings {
         return getString(R.string.pref_pgc_challenge_success_icon, "✅");
     }
 
+    public static void setPgcChallengeSuccessIcon(final String icon) {
+        putString(R.string.pref_pgc_challenge_success_icon, icon);
+    }
+
     public static String getPgcChallengeFailureIcon() {
         return getString(R.string.pref_pgc_challenge_failure_icon, "⛔");
+    }
+
+    public static void setPgcChallengeFailureIcon(final String icon) {
+        putString(R.string.pref_pgc_challenge_failure_icon, icon);
     }
 
     /**

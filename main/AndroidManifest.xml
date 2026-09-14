@@ -934,9 +934,31 @@
         <!-- Map import service -->
         <service android:name=".downloader.ReceiveDownloadService" />
 
-        <!-- Background cache downloader -->
-        <service android:name=".service.CacheDownloaderService" />
-        <receiver android:name=".service.StopCacheDownloadServiceReceiver"/>
+        <!-- Generic batch geocache services -->
+        <service
+            android:name=".service.CacheDownloaderService"
+            android:foregroundServiceType="dataSync"/>
+        <service
+            android:name=".service.WatchCachesBatchService"
+            android:foregroundServiceType="dataSync"/>
+        <service
+            android:name=".service.UnwatchCachesBatchService"
+            android:foregroundServiceType="dataSync"/>
+        <service
+            android:name=".service.UploadCoordinatesBatchService"
+            android:foregroundServiceType="dataSync"/>
+        <service
+            android:name=".service.PersonalNoteUploadService"
+            android:foregroundServiceType="dataSync"/>
+        <service
+            android:name=".service.PgcChallengeCheckerBatchService"
+            android:foregroundServiceType="dataSync"/>
+        <receiver android:name=".service.StopBatchServiceReceiver"/>
+
+        <!-- Background log poster -->
+        <service
+            android:name=".service.LogPostingService"
+            android:foregroundServiceType="dataSync"/>
 
         <!-- Receiver for custom tabs share intent -->
         <receiver android:name=".settings.ShareBroadcastReceiver"/>

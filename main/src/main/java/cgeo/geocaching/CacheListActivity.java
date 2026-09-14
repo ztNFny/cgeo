@@ -507,6 +507,14 @@ public class CacheListActivity extends AbstractListActivity implements FilteredA
             protected void onReceive(final Context context, final String geocode) {
                 if (IterableUtils.matchesAny(adapter.getFilteredList(), geocache -> geocache.getGeocode().equals(geocode))) {
                     refreshCurrentList();
+                    return;
+                }
+                if (IterableUtils.matchesAny(adapter.getFilteredList(), geocache -> geocache.getGeocode().equals(geocode))) {
+                    final Geocache geocache = DataStore.loadCache(geocode, EnumSet.of(LoadFlags.LoadFlag.DB_MINIMAL));
+                    if (geocache != null) {
+                        adapter.setElement(geocache);
+                    }
+                    updateAdapter();
                 }
             }
         });
@@ -726,11 +734,44 @@ public class CacheListActivity extends AbstractListActivity implements FilteredA
             } else { // search and global list (all other than offline and history)
                 setMenuItemLabel(menu, R.id.menu_refresh_stored, R.string.caches_store_selected, R.string.caches_store_offline);
             }
-            setVisibleEnabled(menu, R.id.menu_upload_bookmarklist, Settings.isGCConnectorActive() && Settings.isGCPremiumMember(), !isEmpty);
-            setVisibleEnabled(menu, R.id.menu_upload_modifiedcoords, Settings.isGCConnectorActive(), !isEmpty);
-            setVisibleEnabled(menu, R.id.menu_upload_allcoords, Settings.isGCConnectorActive(), !isEmpty);
-            setEnabled(menu, R.id.menu_show_attributes, !isEmpty);
-            setEnabled(menu, R.id.menu_set_cache_icon, !isEmpty);
+
+            MenuUtils.setVisible(menu, R.id.menu_move_to_list, containsStoredCaches);
+            setMenuItemLabel(menu, R.id.menu_move_to_list, R.string.caches_move_selected, R.string.caches_move_all, checkedCount);
+            MenuUtils.setVisible(menu, R.id.menu_copy_to_list, containsStoredCaches);
+            setMenuItemLabel(menu, R.id.menu_copy_to_list, R.string.caches_copy_selected, R.string.caches_copy_all, checkedCount);
+
+            MenuUtils.setEnabled(menu, R.id.menu_add_to_route, !isEmpty);
+            setMenuItemLabel(menu, R.id.menu_add_to_route, R.string.caches_append_to_route_selected, R.string.caches_append_to_route_all, checkedCount);
+            MenuUtils.setVisible(menu, R.id.menu_delete_events, containsStoredPastEvents);
+            MenuUtils.setVisible(menu, R.id.menu_clear_offline_logs, containsOfflineLogs);
+            MenuUtils.setVisibleEnabled(menu, R.id.menu_remove_from_history, isHistory, !isEmpty);
+            setMenuItemLabel(menu, R.id.menu_remove_from_history, R.string.cache_remove_from_history, R.string.cache_clear_history, checkedCount);
+
+            final boolean removeFromDevice = removeWillDeleteFromDevice(listId);
+            MenuUtils.setVisibleEnabled(menu, R.id.menu_drop_caches, (isHistory || containsStoredCaches) && !removeFromDevice, !isEmpty);
+            setMenuItemLabel(menu, R.id.menu_drop_caches, R.string.caches_remove_selected, R.string.caches_remove_all, checkedCount);
+            MenuUtils.setVisibleEnabled(menu, R.id.menu_drop_caches_all_lists, isHistory || containsStoredCaches, !isEmpty);
+            setMenuItemLabel(menu, R.id.menu_drop_caches_all_lists, R.string.caches_remove_selected_completely, R.string.caches_remove_all_completely, checkedCount);
+            MenuUtils.setVisibleEnabled(menu, R.id.menu_remove_from_other_lists, isOffline && listId != PseudoList.ALL_LIST.id, !isEmpty);
+            setMenuItemLabel(menu, R.id.menu_remove_from_other_lists, R.string.caches_remove_from_other_lists_selected, R.string.caches_remove_from_other_lists_all, checkedCount);
+
+            //MenuUtils.setVisibleEnabled(menu, R.id.menu_upload_bookmarklist, isGcPremiumMember, !isEmpty);
+            MenuUtils.setVisibleEnabled(menu, R.id.menu_upload_bookmarklist, true, !isEmpty);
+            setMenuItemLabel(menu, R.id.menu_upload_bookmarklist, R.string.caches_upload_bookmarklist_selected, R.string.caches_upload_bookmarklist_all, checkedCount);
+
+            MenuUtils.setVisible(menu, R.id.menu_watch_management, WatchListUtils.anySupportsWatchlist(adapter.getCheckedOrAllCaches()));
+            MenuUtils.setVisibleEnabled(menu, R.id.menu_watch_all, WatchListUtils.anySupportsWatchlist(adapter.getCheckedOrAllCaches()), WatchListUtils.anySupportsWatching(adapter.getCheckedOrAllCaches()));
+            setMenuItemLabel(menu, R.id.menu_watch_all, R.string.caches_watch_selected, R.string.caches_watch_all, checkedCount);
+            MenuUtils.setVisibleEnabled(menu, R.id.menu_unwatch_all, WatchListUtils.anySupportsWatchlist(adapter.getCheckedOrAllCaches()), WatchListUtils.anySupportsUnwatching(adapter.getCheckedOrAllCaches()));
+            setMenuItemLabel(menu, R.id.menu_unwatch_all, R.string.caches_unwatch_selected, R.string.caches_unwatch_all, checkedCount);
+
+            MenuUtils.setEnabled(menu, R.id.menu_show_attributes, !isEmpty);
+            setMenuItemLabel(menu, R.id.menu_show_attributes, R.string.caches_show_attributes_selected, R.string.caches_show_attributes_all, checkedCount);
+            MenuUtils.setEnabled(menu, R.id.menu_set_cache_icon, !isEmpty);
+            setMenuItemLabel(menu, R.id.menu_set_cache_icon, R.string.caches_set_cache_icon_selected, R.string.caches_set_cache_icon_all, checkedCount);
+            MenuUtils.setEnabled(menu, R.id.menu_set_final_wp_as_corrected_coords, !isEmpty);
+            setMenuItemLabel(menu, R.id.menu_set_final_wp_as_corrected_coords, R.string.caches_set_final_wp_as_corrected_coords_selected, R.string.caches_set_final_wp_as_corrected_coords_all, checkedCount);
+            MenuUtils.setVisibleEnabled(menu, R.id.menu_recalculate_health_score, true, !isEmpty);
 
             // Manage Lists submenu
             setVisible(menu, R.id.menu_lists, isOffline);
@@ -920,6 +961,10 @@ public class CacheListActivity extends AbstractListActivity implements FilteredA
             }.execute();
         } else if (menuItem == R.id.menu_upload_bookmarklist) {
             BookmarkUtils.askAndUploadCachesToBookmarkList(this, adapter.getCheckedOrAllCaches());
+        } else if (menuItem == R.id.menu_watch_all) {
+            WatchListUtils.watchAll(this, adapter.getCheckedOrAllCaches());
+        } else if (menuItem == R.id.menu_unwatch_all) {
+            WatchListUtils.unwatchAll(this, adapter.getCheckedOrAllCaches());
         } else if (menuItem == R.id.menu_set_listmarker) {
             EmojiUtils.selectEmojiPopup(this, markerId, null, this::setListMarker);
         } else if (menuItem == R.id.menu_set_cache_icon) {
