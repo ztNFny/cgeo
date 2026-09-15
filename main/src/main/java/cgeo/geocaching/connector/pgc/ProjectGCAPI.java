@@ -9,6 +9,7 @@ import cgeo.geocaching.utils.CryptUtils;
 import cgeo.geocaching.utils.LocalizationUtils;
 import cgeo.geocaching.utils.Log;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
@@ -169,9 +170,49 @@ public final class ProjectGCAPI {
 
     }
 
+    public enum TokenValidationResult {
+        PLUS_MEMBER,
+        WRONG_KEY,
+        NOT_PLUS_MEMBER,
+        ERROR
+    }
+
+    /** Validates the given token by calling /test/pgc-plus. Does NOT read from or write to Settings. */
+    @NonNull
+    public static TokenValidationResult validateToken(final String token) {
+        final String endpointPath = "/test/pgc-plus";
+        final String fullPath = "/api/v1" + endpointPath;
+        final Parameters headers = buildAuthHeaders(fullPath, token);
+        if (headers == null) {
+            return TokenValidationResult.ERROR;
+        }
+        try {
+            final cgeo.geocaching.network.HttpResponse response = new HttpRequest()
+                    .uri(BASE_URL + endpointPath)
+                    .method(HttpRequest.Method.GET)
+                    .headers(headers)
+                    .callTimeout(15000)
+                    .request()
+                    .blockingGet();
+            switch (response.getStatusCode()) {
+                case 200: return TokenValidationResult.PLUS_MEMBER;
+                case 401: return TokenValidationResult.WRONG_KEY;
+                case 403: return TokenValidationResult.NOT_PLUS_MEMBER;
+                default:  return TokenValidationResult.ERROR;
+            }
+        } catch (final Exception e) {
+            Log.w("ProjectGCAPI: validateToken failed", e);
+            return TokenValidationResult.ERROR;
+        }
+    }
+
     @Nullable
     private static Parameters buildAuthHeaders(final String endpointPath) {
-        final String userToken = Settings.getProjectGCAccessToken();
+        return buildAuthHeaders(endpointPath, Settings.getProjectGCAccessToken());
+    }
+
+    @Nullable
+    private static Parameters buildAuthHeaders(final String endpointPath, final String userToken) {
         final String userId = String.valueOf(GCUtils.userCodeToUserId(Settings.getGCUserId()));
         final long unixtime = System.currentTimeMillis() / 1000;
         final String message = APP_SECRET + unixtime + userId + userToken + endpointPath;

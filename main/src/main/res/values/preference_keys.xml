@@ -140,6 +140,7 @@
 
     <!-- settings for project-gc.com screen -->
     <string translatable="false" name="preference_screen_projectgc">preference_screen_projectgc</string>
+    <string translatable="false" name="pref_fakekey_info_projectgc">fakekey_info_projectgc</string>
     <string translatable="false" name="pref_connectorProjectGCActive">connectorProjectGCActive</string>
     <string translatable="false" name="pref_pgc_access_token">pgc_access_token</string>
     <string translatable="false" name="pref_pgc_user_id">pgc_user_id</string>

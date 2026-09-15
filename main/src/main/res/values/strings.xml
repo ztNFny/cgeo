@@ -2445,8 +2445,13 @@
 
     <!-- Project-GC -->
     <string name="init_projectgc">Project-GC</string>
-    <string name="init_summary_projectgc">Enable Project-GC services</string>
     <string name="pgc_access_token_title">Access token</string>
+    <string name="pgc_token_validation_failed_title">Project-GC token invalid</string>
+    <string name="pgc_token_not_plus">Project-GC requires a paid Plus membership</string>
+    <string name="pgc_token_wrong_key">Invalid access token — please check and try again</string>
+    <string name="pgc_token_validating">Validating token…</string>
+    <string name="pgc_info_plus_title">Plus membership required</string>
+    <string name="pgc_info_plus_summary">Project-GC connector requires a paid Plus membership for all and Geocaching.com premium membership for some functionalities!</string>
     <string name="pgc_user_id_title">User ID</string>
     <string name="pgc_get_access_token">Get Access token</string>
     <string name="pgc_settings_description">Copy the \'Project-GC Access token\' from https://project-gc.com/User/Settings into the field above.</string>

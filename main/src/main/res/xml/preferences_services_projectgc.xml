@@ -11,8 +11,12 @@
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="@string/pref_connectorProjectGCActive"
-            android:summary="@string/init_summary_projectgc"
             android:title="@string/settings_service_activate"
+            app:iconSpaceReserved="false" />
+        <Preference
+            android:key="@string/pref_fakekey_info_projectgc"
+            android:summary="@string/pgc_info_plus_summary"
+            android:title="@string/pgc_info_plus_title"
             app:iconSpaceReserved="false" />
         <EditTextPreference
             android:dependency="@string/pref_connectorProjectGCActive"
