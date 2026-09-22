@@ -8,17 +8,21 @@ import cgeo.geocaching.databinding.GcManualLoginBinding;
 import cgeo.geocaching.settings.Settings;
 import cgeo.geocaching.utils.AndroidRxUtils;
 import cgeo.geocaching.utils.EmojiUtils;
-import cgeo.geocaching.utils.JsonUtils;
 import cgeo.geocaching.utils.Log;
 import cgeo.geocaching.utils.PreferenceUtils;
 import cgeo.geocaching.utils.ShareUtils;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
+import android.view.View;
+import android.webkit.JavascriptInterface;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 import androidx.annotation.UiThread;
 import androidx.appcompat.app.AlertDialog;
@@ -31,7 +35,6 @@ import androidx.preference.EditTextPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
-import com.fasterxml.jackson.databind.JsonNode;
 
 public class PreferenceServiceProjectGCFragment extends PreferenceFragmentCompat {
 
@@ -49,7 +52,7 @@ public class PreferenceServiceProjectGCFragment extends PreferenceFragmentCompat
 
         final Preference openWebsite = findPreference(getString(R.string.pref_fakekey_pgc_website));
         PreferenceUtils.setOnPreferenceClickListener(openWebsite, preference -> {
-            ShareUtils.openUrl(getContext(), ProjectGCConnector.URL);
+            ShareUtils.openUrl(getContext(), ProjectGCConnector.BASE_URL);
             return true;
         });
 
@@ -58,10 +61,12 @@ public class PreferenceServiceProjectGCFragment extends PreferenceFragmentCompat
     }
 
     @UiThread
+    @SuppressLint("AddJavascriptInterface")
     private void openPgcTokenWebView() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(requireContext(), R.style.cgeo_fullScreenDialog);
         final GcManualLoginBinding binding = GcManualLoginBinding.inflate(LayoutInflater.from(requireContext()));
         binding.info.setText(R.string.pgc_settings_description);
+        binding.okButton.setVisibility(View.GONE);
         final AlertDialog dialog = builder.create();
         dialog.setView(binding.getRoot());
         GCLogin.initializeWebview(binding.webview);
@@ -73,34 +78,45 @@ public class PreferenceServiceProjectGCFragment extends PreferenceFragmentCompat
             return windowInsets;
         });
 
+        binding.webview.addJavascriptInterface(new Object() {
+            @JavascriptInterface
+            public void onValuesExtracted(final String pgcToken, final String userId) {
+                Settings.setProjectGCAccessToken(pgcToken);
+                Settings.setProjectGCUserId(userId);
+                Log.d("[ProjectGC] pgcToken=" + pgcToken + ", userId=" + userId);
+                //Settings.setProjectGCSessionCookie(Cookies.extractCookie(ProjectGCConnector.BASE_URL, "PHPSESSID").value());
+                requireActivity().runOnUiThread(dialog::dismiss);
+            }
+        }, "AndroidBridge");
+
+        // Poll for the token/userId inputs after each page load (page may render dynamically).
+        binding.webview.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageFinished(final WebView view, final String url) {
+                super.onPageFinished(view, url);
+                view.evaluateJavascript(
+                    "(function() {" +
+                    "  var interval = setInterval(function() {" +
+                    "    var inputs = document.querySelectorAll('input');" +
+                    "    var pgcToken = '', userId = '';" +
+                    "    inputs.forEach(function(el) {" +
+                    "      var name = (el.name || el.id || '').toLowerCase();" +
+                    "      if (name.indexOf('token') >= 0 || name.indexOf('key') >= 0) pgcToken = el.value;" +
+                    "      if (name.indexOf('user') >= 0 || name.indexOf('uid') >= 0) userId = el.value;" +
+                    "    });" +
+                    "    if (pgcToken && userId) {" +
+                    "      clearInterval(interval);" +
+                    "      AndroidBridge.onValuesExtracted(pgcToken, userId);" +
+                    "    }" +
+                    "  }, 500);" +
+                    "})()",
+                    null
+                );
+            }
+        });
+
         GCLogin.injectGcCookiesIntoWebView();
         binding.webview.loadUrl("https://project-gc.com/User/Settings");
-        binding.okButton.setOnClickListener(v ->
-            binding.webview.evaluateJavascript(
-                "(function() {" +
-                "  var inputs = document.querySelectorAll('input');" +
-                "  var result = {};" +
-                "  inputs.forEach(function(el) {" +
-                "    var name = (el.name || el.id || '').toLowerCase();" +
-                "    if (name.indexOf('token') >= 0 || name.indexOf('key') >= 0) result.pgcToken = el.value;" +
-                "    if (name.indexOf('user') >= 0 || name.indexOf('uid') >= 0) result.userId = el.value;" +
-                "  });" +
-                "  return result;" +
-                "})()",
-                value -> {
-                    final JsonNode json = JsonUtils.stringToNode(value);
-                    if (null != json) {
-                        final String pgcToken = JsonUtils.toText(JsonUtils.get(json, "pgcToken"), "");
-                        final String userId = JsonUtils.toText(JsonUtils.get(json, "userId"), "");
-                        if (!userId.isBlank() && !pgcToken.isBlank()) {
-                            Settings.setProjectGCAccessToken(pgcToken);
-                            Settings.setProjectGCUserId(userId);
-                        }
-                        Log.d("[ProjectGC] pgcToken=" + pgcToken + ", userId=" + userId);
-                    }
-                }
-            )
-        );
         binding.cancelButton.setOnClickListener(v -> dialog.dismiss());
         dialog.show();
     }

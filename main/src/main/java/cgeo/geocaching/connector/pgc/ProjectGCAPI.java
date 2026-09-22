@@ -21,11 +21,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.commons.lang3.StringUtils;
 
 public final class ProjectGCAPI {
-
     private static final String APP_ID = "103";
-    // TODO: Move this into build files
-    private static final String APP_SECRET = LocalizationUtils.getPlainString(R.string.projectgc_consumer_key);;
-    private static final String BASE_URL = "https://project-gc.com/api/v1";
+    private static final String APP_SECRET = LocalizationUtils.getPlainString(R.string.projectgc_consumer_key);
+    private static final String API_URL = ProjectGCConnector.BASE_URL + "/api/v1";
 
     private ProjectGCAPI() {
         // no instance
@@ -110,7 +108,7 @@ public final class ProjectGCAPI {
         }
         try {
             HttpRequest request = new HttpRequest()
-                    .uri(BASE_URL + endpointPath)
+                    .uri(API_URL + endpointPath)
                     .method(method)
                     .headers(headers)
                     .callTimeout(15000);
@@ -188,7 +186,7 @@ public final class ProjectGCAPI {
         }
         try {
             final cgeo.geocaching.network.HttpResponse response = new HttpRequest()
-                    .uri(BASE_URL + endpointPath)
+                    .uri(API_URL + endpointPath)
                     .method(HttpRequest.Method.GET)
                     .headers(headers)
                     .callTimeout(15000)

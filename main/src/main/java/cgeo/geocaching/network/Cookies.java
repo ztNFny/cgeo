@@ -2,6 +2,8 @@ package cgeo.geocaching.network;
 
 import cgeo.geocaching.settings.DiskCookieStore;
 
+import android.webkit.CookieManager;
+
 import androidx.annotation.NonNull;
 
 import java.util.HashMap;
@@ -18,7 +20,19 @@ public final class Cookies {
 
     static final InMemoryCookieJar cookieJar = new InMemoryCookieJar();
 
-    private static class InMemoryCookieJar implements CookieJar {
+    public static Cookie extractCookie(final String url, final String cookieName) {
+        final String webViewCookies = CookieManager.getInstance().getCookie(url);
+        final List<Cookie> cookies = extractCookies(url, webViewCookies, c -> c.name().equals(cookieName));
+        if (cookies.isEmpty()) {
+            return null;
+        }
+        return cookies.get(0);
+    }
+
+    public static class InMemoryCookieJar implements CookieJar {
+
+        /** Expiry given to legacy persisted entries (written without one) when restoring them. */
+        private static final long LEGACY_COOKIE_LIFETIME_MS = 365L * 24 * 60 * 60 * 1000;
 
         final HashMap<String, Cookie> allCookies = new HashMap<>();
 
