@@ -964,6 +964,14 @@ public class Settings {
         putString(R.string.pref_pgc_access_token, token);
     }
 
+    public static String getProjectGCUserId() {
+        return getString(R.string.pref_pgc_user_id, null);
+    }
+
+    public static void setProjectGCUserId(final String userId) {
+        putString(R.string.pref_pgc_user_id, userId);
+    }
+
     public static boolean getPgcChallengeUpdateCacheIcon() {
         return getBoolean(R.string.pref_pgc_challenge_update_cache_icon, true);
     }
