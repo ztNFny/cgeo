@@ -3,6 +3,8 @@ package cgeo.geocaching.network;
 import cgeo.geocaching.settings.Settings;
 import cgeo.geocaching.utils.Log;
 
+import android.webkit.CookieManager;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -36,6 +38,15 @@ public final class Cookies {
             }
         }
         return cookies;
+    }
+
+    public static Cookie extractCookie(final String url, final String cookieName) {
+        final String webViewCookies = CookieManager.getInstance().getCookie(url);
+        final List<Cookie> cookies = extractCookies(url, webViewCookies, c -> c.name().equals(cookieName));
+        if (cookies.isEmpty()) {
+            return null;
+        }
+        return cookies.get(0);
     }
 
     public static class InMemoryCookieJar implements CookieJar {

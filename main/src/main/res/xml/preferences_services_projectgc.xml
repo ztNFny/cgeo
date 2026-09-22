@@ -22,6 +22,7 @@
             android:dependency="@string/pref_connectorProjectGCActive"
             android:key="@string/pref_pgc_access_token"
             android:title="@string/pgc_access_token_title"
+            app:isPreferenceVisible="false"
             app:iconSpaceReserved="false" />
         <Preference
             android:dependency="@string/pref_connectorProjectGCActive"
