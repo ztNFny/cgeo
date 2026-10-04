@@ -45,6 +45,7 @@ public class PgcChallengeCheckerBatchService extends AbstractGeocacheBatchServic
         if (result == null) {
             return false;
         }
+        // batch checking is enabled only with icon-update, so no need to check Settings.getPgcChallengeUpdateCacheIcon() here
         final String icon = result ? Settings.getPgcChallengeSuccessIcon() : Settings.getPgcChallengeFailureIcon();
         DataStore.setCacheIcons(Collections.singletonList(cache), icon);
         GeocacheChangedBroadcastReceiver.sendBroadcast(this, geocode);

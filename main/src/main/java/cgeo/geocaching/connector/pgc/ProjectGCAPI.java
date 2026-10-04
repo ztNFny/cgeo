@@ -3,9 +3,11 @@ package cgeo.geocaching.connector.pgc;
 import cgeo.geocaching.R;
 import cgeo.geocaching.connector.gc.GCUtils;
 import cgeo.geocaching.network.HttpRequest;
+import cgeo.geocaching.network.HttpResponse;
 import cgeo.geocaching.network.Parameters;
 import cgeo.geocaching.settings.Settings;
 import cgeo.geocaching.utils.CryptUtils;
+import cgeo.geocaching.utils.JsonUtils;
 import cgeo.geocaching.utils.LocalizationUtils;
 import cgeo.geocaching.utils.Log;
 
@@ -29,22 +31,22 @@ public final class ProjectGCAPI {
         // no instance
     }
 
-    /** Returns the "data" field of the API response on success, null on error or missing auth. */
+    /** Like {@link #get(String, PgcEndpoint)}, but enforces the given endpoint's rate limit. */
     @Nullable
-    public static JsonNode get(final String endpointPath) {
-        return executeRequest(endpointPath, HttpRequest.Method.GET, null);
+    static JsonNode get(final String endpointPath, final PgcEndpoint endpoint) {
+        return executeRequest(endpointPath, HttpRequest.Method.GET, null, endpoint);
     }
 
     /** Returns the "data" field of the API response on success, null on error or missing auth. */
     @Nullable
-    public static JsonNode post(final String endpointPath, @Nullable final JsonNode jsonBody) {
-        return executeRequest(endpointPath, HttpRequest.Method.POST, jsonBody);
+    public static JsonNode post(final String endpointPath, @Nullable final JsonNode jsonBody, final PgcEndpoint endpoint) {
+        return executeRequest(endpointPath, HttpRequest.Method.POST, jsonBody, endpoint);
     }
 
     /** Returns the "data" field of the API response on success, null on error or missing auth. */
     @Nullable
-    public static JsonNode put(final String endpointPath, @Nullable final JsonNode jsonBody) {
-        return executeRequest(endpointPath, HttpRequest.Method.PUT, jsonBody);
+    public static JsonNode put(final String endpointPath, @Nullable final JsonNode jsonBody, final PgcEndpoint endpoint) {
+        return executeRequest(endpointPath, HttpRequest.Method.PUT, jsonBody, endpoint);
     }
 
     /**
@@ -54,13 +56,12 @@ public final class ProjectGCAPI {
     @Nullable
     public static JsonNode delete(final String endpointPath) {
         // TODO: implement DELETE once HttpRequest.Method includes DELETE
-        Log.w("ProjectGCAPI.delete: DELETE not yet implemented for " + endpointPath);
         return null;
     }
 
     /** Returns list of available Virtual GPS lists for the authenticated user. */
     public static List<VgpsList> getVgpsLists() {
-        final JsonNode data = get("/virtual-gps");
+        final JsonNode data = get("/virtual-gps", PgcEndpoint.VGPS_ENUMERATE);
         if (data == null) {
             return Collections.emptyList();
         }
@@ -88,7 +89,7 @@ public final class ProjectGCAPI {
 
     /** Returns list of geocodes (GC codes) for the given VGPS list ID. */
     public static List<String> getVgpsCaches(final int vgpsId) {
-        final JsonNode data = get("/virtual-gps/vgpsid:" + vgpsId);
+        final JsonNode data = get("/virtual-gps/vgpsid:" + vgpsId, PgcEndpoint.VGPS_RETRIEVE);
         if (data == null || !data.isArray()) {
             return Collections.emptyList();
         }
@@ -100,43 +101,56 @@ public final class ProjectGCAPI {
     }
 
     @Nullable
-    private static JsonNode executeRequest(final String endpointPath, final HttpRequest.Method method, @Nullable final JsonNode jsonBody) {
+    private static JsonNode executeRequest(final String endpointPath, final HttpRequest.Method method, @Nullable final JsonNode jsonBody, @Nullable final PgcEndpoint throttlingEndpoint) {
         final String fullPath = "/api/v1" + endpointPath;
         final Parameters headers = buildAuthHeaders(fullPath);
         if (headers == null) {
             return null;
         }
-        try {
-            HttpRequest request = new HttpRequest()
-                    .uri(API_URL + endpointPath)
-                    .method(method)
-                    .headers(headers)
-                    .callTimeout(15000);
-            if (jsonBody != null) {
-                request = request.bodyJson(jsonBody);
+        for (int attempt = 0; attempt < 2; attempt++) {
+            if (throttlingEndpoint != null) {
+                throttlingEndpoint.acquire();
             }
-            final JsonNode response = request.requestJsonNode().blockingGet();
-            if (response == null || !response.has("data")) {
-                return null;
-            }
-            final JsonNode status = response.get("status");
-            if (status != null && !status.isNull()) {
-                final String statusMsg = status.get("message").asText();
-                if (statusMsg.equals("ok")) {
-                    return response.get("data");
-                } else {
-                    final Optional<ProjectGCAPIError> error = ProjectGCAPIError.isError(statusMsg);
-                    if (error.isPresent()) {
-                        throw new Exception(error.get().getUserErrorMessage());
+            try {
+                HttpRequest request = new HttpRequest()
+                        .uri(API_URL + endpointPath)
+                        .method(method)
+                        .headers(headers)
+                        .callTimeout(15000);
+                if (jsonBody != null) {
+                    request = request.bodyJson(jsonBody);
+                }
+                final HttpResponse httpResponse = request.request().blockingGet();
+                if (httpResponse.getStatusCode() == 429) {
+                    if (throttlingEndpoint != null) {
+                        throttlingEndpoint.on429();
+                        continue; // retry after backoff via acquire()
+                    }
+                    return null;
+                }
+                final JsonNode response = JsonUtils.stringToNode(httpResponse.getBodyString(), false);
+                if (response == null || !response.has("data")) {
+                    return null;
+                }
+                final JsonNode status = response.get("status");
+                if (status != null && !status.isNull()) {
+                    final String statusMsg = status.get("message").asText();
+                    if (statusMsg.equals("ok")) {
+                        return response.get("data");
                     } else {
-                        Log.e("ProjectGCAPI: API returned unknown non-ok status: " + statusMsg);
-                        throw new Exception("ProjectGCAPI: API returned unknown non-ok status: " + statusMsg);
+                        final Optional<ProjectGCAPIError> error = ProjectGCAPIError.isError(statusMsg);
+                        if (error.isPresent()) {
+                            throw new Exception(error.get().getUserErrorMessage());
+                        } else {
+                            Log.e("ProjectGCAPI: API returned unknown non-ok status: " + statusMsg);
+                            throw new Exception("ProjectGCAPI: API returned unknown non-ok status: " + statusMsg);
+                        }
                     }
                 }
+            } catch (final Exception e) {
+                Log.w("ProjectGCAPI: request failed for " + endpointPath, e);
+                return null;
             }
-        } catch (final Exception e) {
-            Log.w("ProjectGCAPI: request failed for " + endpointPath, e);
-            return null;
         }
         return null;
     }
@@ -145,7 +159,7 @@ public final class ProjectGCAPI {
     @Nullable
     public static Boolean checkChallenge(final String gcCode) {
         try {
-            final JsonNode response = get("/challenge-checker/gccode:" + gcCode + "/prcode:" + Settings.getGCUserId() + "/cached");
+            final JsonNode response = get("/challenge-checker/gccode:" + gcCode + "/prcode:" + Settings.getGCUserId() + "/cached", PgcEndpoint.CHALLENGE_CHECKER_GCCODE_CACHED);
             if (response == null || !response.isArray() || response.isEmpty()) {
                 return null;
             }
@@ -157,7 +171,7 @@ public final class ProjectGCAPI {
     }
 
     public static boolean isPlusUser() {
-        final JsonNode result = get("/test/pgc-plus");
+        final JsonNode result = get("/test/pgc-plus", null);
         return result.asText().equals("Project-GC Plus membership confirmed.");
     }
 

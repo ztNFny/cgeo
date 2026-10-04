@@ -11,21 +11,21 @@ public class ProjectGCAPITest {
     @Test
     @MediumTest
     public void testPing() {
-        final JsonNode result = ProjectGCAPI.get("/ping");
+        final JsonNode result = ProjectGCAPI.get("/ping", null);
         assertThat(result.asText().equals("pong"));
     }
 
     @Test
     @MediumTest
     public void testUser() {
-        final JsonNode result = ProjectGCAPI.get("/user");
+        final JsonNode result = ProjectGCAPI.get("/user", null);
         System.out.println("ProjectGCAPI /user: " + result);
     }
 
     @Test
     @MediumTest
     public void testPgcPlus() {
-        final JsonNode result = ProjectGCAPI.get("/test/pgc-plus");
+        final JsonNode result = ProjectGCAPI.get("/test/pgc-plus", null);
         System.out.println("ProjectGCAPI /test/pgc-plus: " + result);
     }
 }
