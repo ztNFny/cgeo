@@ -2450,6 +2450,7 @@
     <string name="pgc_token_not_plus">Project-GC requires a paid Plus membership</string>
     <string name="pgc_token_wrong_key">Invalid access token — please check and try again</string>
     <string name="pgc_token_validating">Validating token…</string>
+    <string name="pgc_login_complete">Login complete</string>
     <string name="pgc_info_plus_title">Plus membership required</string>
     <string name="pgc_info_plus_summary">Project-GC connector requires a paid Plus membership for all and Geocaching.com premium membership for some functionalities!</string>
     <string name="pgc_user_id_title">User ID</string>
