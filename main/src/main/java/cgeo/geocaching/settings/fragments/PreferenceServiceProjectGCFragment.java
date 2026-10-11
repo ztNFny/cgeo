@@ -23,6 +23,7 @@ import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
 
 import androidx.annotation.UiThread;
 import androidx.appcompat.app.AlertDialog;
@@ -85,7 +86,10 @@ public class PreferenceServiceProjectGCFragment extends PreferenceFragmentCompat
                 Settings.setProjectGCUserId(userId);
                 Log.d("[ProjectGC] pgcToken=" + pgcToken + ", userId=" + userId);
                 //Settings.setProjectGCSessionCookie(Cookies.extractCookie(ProjectGCConnector.BASE_URL, "PHPSESSID").value());
-                requireActivity().runOnUiThread(dialog::dismiss);
+                requireActivity().runOnUiThread(() -> {
+                    dialog.dismiss();
+                    Toast.makeText(requireContext(), R.string.pgc_login_complete, Toast.LENGTH_SHORT).show();
+                });
             }
         }, "AndroidBridge");
 
