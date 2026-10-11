@@ -15,10 +15,10 @@ import java.util.Deque;
 enum PgcEndpoint {
 
     CHALLENGE_CHECKER_GCCODE_CACHED(10, 60_000),
+    CHALLENGE_CHECKER_GCCODE_CHECK(10, 600_000),
     VGPS_ENUMERATE(10, 60_000),
     VGPS_RETRIEVE(10, 60_000),
     // add further endpoints with confirmed limits here, e.g.:
-    // CHALLENGE_CHECKER_GCCODE_CHECK(?, 60_000),
     // CHALLENGE_CHECKER_TAG_CACHED(?, 60_000),
     ;
 

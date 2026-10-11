@@ -155,17 +155,37 @@ public final class ProjectGCAPI {
         return null;
     }
 
-    /** Checks the challenge cache eligibility for the current user. Returns true/false, or null on error. */
+    /** Checks the challenge cache eligibility for the current user, running a check if no cached result exists. Returns true/false, or null on error. */
     @Nullable
-    public static Boolean checkChallenge(final String gcCode) {
+    public static Boolean checkChallenge(final String geocode) {
         try {
-            final JsonNode response = get("/challenge-checker/gccode:" + gcCode + "/prcode:" + Settings.getGCUserId() + "/cached", PgcEndpoint.CHALLENGE_CHECKER_GCCODE_CACHED);
-            if (response == null || !response.isArray() || response.isEmpty()) {
+            final String challengePath = "/challenge-checker/gccode:" + geocode + "/prcode:" + Settings.getGCUserId();
+            final JsonNode response = get(challengePath + "/cached", PgcEndpoint.CHALLENGE_CHECKER_GCCODE_CACHED);
+            if (response != null && response.isArray()) {
+                if (!response.isEmpty()) {
+                    return response.get(0).path("status").asBoolean();
+                } else {
+                    // no cached result available
+                    return runChallengeCheck(geocode);
+                }
+            }
+            return null;
+        } catch (final Exception e) {
+            Log.w("ProjectGCAPI: checkChallenge failed for " + geocode, e);
+            return null;
+        }
+    }
+
+    public static Boolean runChallengeCheck(final String geocode) {
+        try {
+            final String challengePath = "/challenge-checker/gccode:" + geocode + "/prcode:" + Settings.getGCUserId();
+            final JsonNode response = post(challengePath + "/check", JsonUtils.stringToNode("{ \"exampleLog\": false }"), PgcEndpoint.CHALLENGE_CHECKER_GCCODE_CHECK);
+            if (response == null || !response.isObject() || !response.has("status") || !response.get("status").isBoolean()) {
                 return null;
             }
-            return response.get(0).path("status").asBoolean();
+            return response.get("status").asBoolean();
         } catch (final Exception e) {
-            Log.w("ProjectGCAPI: checkChallenge failed for " + gcCode, e);
+            Log.w("ProjectGCAPI: checkChallenge failed for " + geocode, e);
             return null;
         }
     }
